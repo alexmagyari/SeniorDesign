@@ -47,14 +47,15 @@
 // *** Initialize the gyroscope
 void gyro_init();
 
-// *** Return the 32 bit X value from the gyro
-int16_t gyroX();
+// *** Return the 16 bit X rate from the gyro
+// Gyro angular rate = gyroOut/GyroSensitivity
+float gyroX();
 
-// *** Return the 32 bit Y value from the gyro
-int16_t gyroY();
+// *** Return the 16 bit Y rate from the gyro
+float gyroY();
 
-// *** Return the 32 bit Z value from the gyro
-int16_t gyroZ();
+// *** Return the 16 bit Z rate from the gyro
+float gyroZ();
 
 
 #endif /* GYRO_H_ */

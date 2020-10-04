@@ -16,23 +16,26 @@ void gyro_init(){
     // I2CWrite(GYROSCOPE, GYRO_PWR_MGMT_2, GYRO_DISABLE_ACCEL);
 }
 
-int16_t gyroX(){
+float gyroX(){
     int16_t x = I2CRead(GYROSCOPE, GYRO_X_MSB);
     x = x << 8;
     x |= I2CRead(GYROSCOPE, GYRO_X_LSB);
-    return x;
+    float total = x;
+    return total / 250;
 }
 
-int16_t gyroY(){
+float gyroY(){
     int16_t y = I2CRead(GYROSCOPE, GYRO_Y_MSB);
     y = y << 8;
     y |= I2CRead(GYROSCOPE, GYRO_Y_LSB);
-    return y;
+    float total = y;
+    return total / 250;
 }
 
-int16_t gyroZ(){
+float gyroZ(){
     int16_t z = I2CRead(GYROSCOPE, GYRO_Z_MSB);
     z = z << 8;
     z |= I2CRead(GYROSCOPE, GYRO_Z_LSB);
-    return z;
+    float total = z;
+    return total / 250;
 }
