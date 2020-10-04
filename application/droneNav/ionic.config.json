@@ -1,5 +1,7 @@
 {
-  "name": "droneNav",
-  "integrations": {},
+  "name": "DroneControl",
+  "integrations": {
+    "capacitor": {}
+  },
   "type": "angular"
 }

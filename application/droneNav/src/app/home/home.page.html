@@ -1,0 +1,41 @@
+<ion-content [fullscreen]="true">
+  <div #map id="map"></div>
+  <div id="flightInformation">
+    <ion-list>
+      <ion-item>
+        <ion-label>Total Hover Time</ion-label>
+        <ion-note slot="end" color="primary">{{totalHoverTime}} [min]</ion-note>
+      </ion-item>
+      <ion-item>
+        <ion-label>Total Travel Time</ion-label>
+        <ion-note slot="end" color="primary">{{totalTravelTime}} [min]</ion-note>
+      </ion-item>
+      <ion-item>
+        <ion-label>Total Flight Time</ion-label>
+        <ion-note slot="end" color="primary">{{totalFlightTime}} [min]</ion-note>
+      </ion-item>
+      <ion-item>
+        <ion-label>Max Flight Time</ion-label>
+        <ion-note slot="end" color="primary">{{totalMaxFlightTime}}</ion-note>
+      </ion-item>
+      <ion-item>
+        <ion-label>Battery Usage</ion-label>
+        <ion-note slot="end" color="primary">{{totalBatteryUsage}}%</ion-note>
+      </ion-item>
+      <ion-item>
+        <ion-label>Connected Drone</ion-label>
+        <ion-note slot="end" [color]="droneIsConnected() ? 'primary' : 'danger'">{{droneName}}</ion-note>
+      </ion-item>
+      <ion-item text-center >
+        <ion-button expand="block" style="width: 100%;" (click)="uploadWaypoints()" [class.button-disabled]="!droneIsConnected()">Upload Waypoints</ion-button>
+      </ion-item>
+      <ion-item text-center >
+        <ion-button expand="block" style="width: 100%;" (click)="modifyParameters()">Modify Drone Parameters</ion-button>
+      </ion-item>
+      <ion-item text-center >
+        <ion-button expand="block" style="width: 100%;" (click)="confirmReset()">Reset Location</ion-button>
+      </ion-item>
+    </ion-list>
+  </div>
+  
+</ion-content>
