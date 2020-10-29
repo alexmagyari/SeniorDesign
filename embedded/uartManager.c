@@ -60,6 +60,7 @@
 #include <stdio.h>
 
 #include <i2cManager.h>
+#include <motor.h>
 //![Simple UART Config]
 /* UART Configuration Parameter. These are the configuration parameters to
  * make the eUSCI A UART module to operate with a 9600 baud rate. These
@@ -102,7 +103,7 @@ void UART_init(void){
     MAP_UART_enableInterrupt(EUSCI_A0_BASE, EUSCI_A_UART_RECEIVE_INTERRUPT);
     MAP_Interrupt_enableInterrupt(INT_EUSCIA0);
     MAP_Interrupt_enableSleepOnIsrExit();
-    MAP_Interrupt_enableMaster();   
+    MAP_Interrupt_enableMaster();
 }
 void UART2PCChar(uint8_t character){
     MAP_UART_transmitData(EUSCI_A0_BASE, character);
@@ -140,9 +141,20 @@ void EUSCIA0_IRQHandler(void)
     MAP_UART_clearInterruptFlag(EUSCI_A0_BASE, status);
     if(status & EUSCI_A_UART_RECEIVE_INTERRUPT_FLAG)
     {
+
         uint8_t incomingData = MAP_UART_receiveData(EUSCI_A0_BASE);
 
+
         UART2PCChar(incomingData);
+        if (incomingData == '+')
+            armMotors();
+        if (incomingData == '-')
+            disarmMotors();
+        if (incomingData >= '0' && incomingData <= '9')
+            editMainPWM((incomingData - '0') * 10);
+        MAP_Interrupt_disableSleepOnIsrExit();
+        return;
     }
+    return;
 
 }

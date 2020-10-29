@@ -71,180 +71,69 @@ int main(void)
 ////
     UART_init();
     I2C_init();
+    initPWM(MOTOR_PWM_PERIOD, 0);
     altimeter_init();
     gyro_init();
 
+    volatile int32_t c = 4800000;
+    while (c != 0)
+        c--;
+    armMotors();
+    editMainPWM(20);
+    c = 10000000;
+    while (c != 0)
+        c--;
+    disarmMotors();
 
-    int c = 0;
-    float x, y, z = 0;
-    while (1)
-    {
-        while (c < 1000000)
-            c++;
-
-        c = 0;
-
-        // Altitude out
-        char altitudeOutput[] = "*** Altitude Values***\0";
-        UART2PCString(altitudeOutput);
-        UART2PCNewLine();
-        char ao2[] = "Current Altitude: \0";
-        UART2PCString(ao2);
-        UART2PCFloat(altitude());
-        UART2PCNewLine();
-        char output[] = "Delta Altitude: \0";
-        UART2PCString(output);
-        UART2PCFloat(changeInAltitude());
-        UART2PCNewLine();
-        UART2PCNewLine();
-
-        // Gyro Out
-        x = gyroX();
-        y = gyroY();
-        z = gyroZ();
-        char gyroOutput[] = "**** Gyro values: ****\0";
-        char gyroXc[] = "X: \0";
-        char gyroYc[] = "Y: \0";
-        char gyroZc[] = "Z: \0";
-        UART2PCString(gyroOutput);
-        UART2PCNewLine();
-        UART2PCString(gyroXc);
-        UART2PCFloat(x);
-        UART2PCNewLine();
-        UART2PCString(gyroYc);
-        UART2PCFloat(y);
-        UART2PCNewLine();
-        UART2PCString(gyroZc);
-        UART2PCFloat(z);
-        UART2PCNewLine();
-        UART2PCNewLine();
-        UART2PCNewLine();
-    }
-
-
-
-
-    // MOTOR SWEEP STUFF
-    int allMotorPWM = MIN_MAIN_MOTOR_PWM;
-    int motor1PWM = 0;
-    int motor2PWM = -1 * MAX_MOTOR_OFFSET;
-    int motor3PWM = MAX_MOTOR_OFFSET;
-    int allMotorIncrease = 1;
-    int singleMotorIncrease1 = 1;
-    int singleMotorIncrease2 = 1;
-    int singleMotorIncrease3 = 0;
-    initPWM(MOTOR_PWM_PERIOD, allMotorPWM);
-
-  int count = 0;
-
-
-//  while (1){
-//      if (count < 10000)
-//      {
-//          count ++;
-//      }
-//      else
-//      {
-//          if (allMotorIncrease == 1)
-//          {
-//              if (allMotorPWM < MAX_MAIN_MOTOR_PWM)
-//              {
-//                  allMotorPWM ++;
-//              }
-//              else
-//              {
-//                  allMotorIncrease = 0;
-//              }
-//          }
-//          else
-//          {
-//              if (allMotorPWM > MIN_MAIN_MOTOR_PWM)
-//              {
-//                  allMotorPWM = allMotorPWM - 1;
-//              }
-//              else
-//              {
-//                  allMotorIncrease = 1;
-//              }
-//          }
+  while (1){}
 //
+//    int c = 0;
+//    float x, y, z = 0;
+////    while (1)
+//    {
+
+//while(1){
+//        while (c < 1000000)
+//            c++;
 //
-//          if (singleMotorIncrease1 == 1)
-//          {
-//              if (motor1PWM < MAX_MOTOR_OFFSET)
-//              {
-//                  motor1PWM = (allMotorIncrease == 1) ? motor1PWM + 1 : motor1PWM + 3;
-//              }
-//              else
-//              {
-//                  singleMotorIncrease1 = 0;
-//              }
-//          }
-//          else
-//          {
-//              if (motor1PWM > -1 * MAX_MOTOR_OFFSET)
-//              {
-//                  motor1PWM = (allMotorIncrease == 1) ? motor1PWM - 3 : motor1PWM - 1;
-//              }
-//              else
-//              {
-//                  singleMotorIncrease1 = 1;
-//              }
-//          }
+//        c = 0;
+////        // Altitude out
+//        char altitudeOutput[] = "*** Altitude Values***\0";
+//        UART2PCString(altitudeOutput);
+//        UART2PCNewLine();
+//        char ao2[] = "Current Altitude: \0";
+//        UART2PCString(ao2);
+//        UART2PCFloat(altitude());
+//        UART2PCNewLine();
+//        char output[] = "Delta Altitude: \0";
+//        UART2PCString(output);
+//        UART2PCFloat(changeInAltitude());
+////        UART2PCNewLine();
+////        UART2PCNewLine();
 //
-//          if (singleMotorIncrease2 == 1)
-//                    {
-//                        if (motor2PWM < MAX_MOTOR_OFFSET)
-//                        {
-//                            motor2PWM = (allMotorIncrease == 1) ? motor2PWM + 1 : motor2PWM + 3;
-//                        }
-//                        else
-//                        {
-//                            singleMotorIncrease2 = 0;
-//                        }
-//                    }
-//                    else
-//                    {
-//                        if (motor2PWM > -1 * MAX_MOTOR_OFFSET)
-//                        {
-//                            motor2PWM = (allMotorIncrease == 1) ? motor2PWM - 3 : motor2PWM - 1;
-//                        }
-//                        else
-//                        {
-//                            singleMotorIncrease2 = 1;
-//                        }
-//                    }
-//
-//
-//          if (singleMotorIncrease3 == 1)
-//                    {
-//                        if (motor3PWM < MAX_MOTOR_OFFSET)
-//                        {
-//                            motor3PWM = (allMotorIncrease == 1) ? motor3PWM + 1 : motor3PWM + 3;
-//                        }
-//                        else
-//                        {
-//                            singleMotorIncrease3 = 0;
-//                        }
-//                    }
-//                    else
-//                    {
-//                        if (motor3PWM > -1 * MAX_MOTOR_OFFSET)
-//                        {
-//                            motor3PWM = (allMotorIncrease == 1) ? motor3PWM - 3 : motor3PWM - 1;
-//                        }
-//                        else
-//                        {
-//                            singleMotorIncrease3 = 1;
-//                        }
-//                    }
-//            editMainPWM(allMotorPWM);
-//            editMotorPWM(1, allMotorPWM + motor1PWM);
-//            editMotorPWM(2, allMotorPWM + motor2PWM);
-//            editMotorPWM(3, allMotorPWM + motor3PWM);
-//            count = 0;
-//      }
-//  }
+//       //  Gyro Out
+//        x = gyroX();
+//        y = gyroY();
+//        z = gyroZ();
+//        char gyroOutput[] = "**** Gyro values: ****\0";
+//        char gyroXc[] = "X: \0";
+//        char gyroYc[] = "Y: \0";
+//        char gyroZc[] = "Z: \0";
+//        UART2PCString(gyroOutput);
+//        UART2PCNewLine();
+//        UART2PCString(gyroXc);
+//        UART2PCFloat(x);
+//        UART2PCNewLine();
+//        UART2PCString(gyroYc);
+//        UART2PCFloat(y);
+//        UART2PCNewLine();
+//        UART2PCString(gyroZc);
+//        UART2PCFloat(z);
+//        UART2PCNewLine();
+//        UART2PCNewLine();
+//        UART2PCNewLine();
+//    }
+
 
     return 0;
 }
