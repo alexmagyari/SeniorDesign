@@ -76,7 +76,7 @@
 char* GPS_Input (void) {
 
 
-    MAP_I2C_setSlaveAddress(EUSCI_B0_BASE, slaveAdd);
+    MAP_I2C_setSlaveAddress(EUSCI_B0_BASE, 0x42);
     MAP_I2C_setMode(EUSCI_B0_BASE, EUSCI_B_I2C_RECEIVE_MODE);
     MAP_I2C_enableModule(EUSCI_B0_BASE);
 
@@ -101,6 +101,7 @@ char* GPS_Input (void) {
                     i++;
                 }
             a = result;
+//            UART2PCString(a);
             break;
             }
         }
@@ -265,7 +266,8 @@ float ToLonDecimal(char c[], char d){
     return result;
 }
 
-void gpsTake(struct location gps){
+struct location gpsTake(){
+    struct location gps;
     char* input = GPS_Input();
     char s[100];
     char temp[20];
@@ -283,6 +285,7 @@ void gpsTake(struct location gps){
         strcpy(temp, gps.longitude);
         strcpy(t1, gps.lonDirection);
         gps.LonDecimal = ToLonDecimal(temp, t1);
+        return gps;
 }
 
 

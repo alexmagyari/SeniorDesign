@@ -46,7 +46,7 @@ float ToLatDecimal(char c[], char d);
 //Convert Longitude to decimal form and fit in x-y plane
 float ToLonDecimal(char c[], char d);
 
-void gpsTake(struct location gps);
+struct location gpsTake();
 
 
 #endif /* GPSMANAGER_H_ */
