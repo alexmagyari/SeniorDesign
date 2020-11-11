@@ -9,11 +9,25 @@
 #include <uartManager.h>
 #include <gyro.h>
 
-void gyro_init(){
+// not entirely sure if this is needed bc it might be set in init
+#define GYRO_SCALE_FACTOR   16.4f
+#define ACCEL_SCALE_FACTOR  4096.0f
+
+void imu_init(){
+    // ensure in USR0; maybe better as a check with I2CRead?
+    // I2CWrite(GYROSCOPE, REG_BANK_SEL, REG_BANK_0);
+
     uint8_t prefs = GYRO_DMP_EN | GYRO_DMP_RST;
     I2CWrite(GYROSCOPE, GYRO_USER_CTRL, prefs);
     I2CWrite(GYROSCOPE, GYRO_PWR_MGMT_1, GYRO_CLOCK_PLL);
     // I2CWrite(GYROSCOPE, GYRO_PWR_MGMT_2, GYRO_DISABLE_ACCEL);
+
+    // change to USR2
+    I2CWrite(GYROSCOPE, REG_BANK_SEL, REG_BANK_2);
+    // gyro config
+    I2CWrite(GYROSCOPE, GYRO_CONFIG, GYRO_FS_SEL);
+    // accel config
+    I2CWrite(GYROSCOPE, ACCEL_CONFIG, ACCEL_FS_SEL);
 }
 
 float gyroX(){
