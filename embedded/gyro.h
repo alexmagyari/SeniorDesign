@@ -5,7 +5,9 @@
  *      Author: amag0
  *  Status: power mode?
  *            mode8 = 9DOF w opt DMP
- *          add accel/mag methods
+ *          add sensor calibration methods?
+ *          add check if IMU ready to be read?
+ *          convert fns to use struct?
  *          add temp methods?
  *          figure out wth the DMP does
  */
@@ -125,5 +127,15 @@ float gyroY();
 // *** Return the 16 bit Z rate from the gyro
 float gyroZ();
 
+// *** Return 16 bit X,Y,Z readings from the accel
+// acceleration = accelOut/AccelSensitivity
+float accelX();
+float accelY();
+float accelZ();
+
+// *** Return 16 bit X,Y,Z readings from mag
+float magX();
+float magY();
+float magZ();
 
 #endif /* GYRO_H_ */

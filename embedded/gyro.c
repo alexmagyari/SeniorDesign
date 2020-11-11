@@ -12,6 +12,7 @@
 // not entirely sure if this is needed bc it might be set in init
 #define GYRO_SCALE_FACTOR   16.4f
 #define ACCEL_SCALE_FACTOR  4096.0f
+#define GYRO_SCALE_FACTOR   0.15f
 
 void imu_init(){
     // ensure in USR0; maybe better as a check with I2CRead?
@@ -31,25 +32,100 @@ void imu_init(){
 }
 
 float gyroX(){
+    // ensure in USR0; maybe better as a check with I2CRead?
+    // I2CWrite(GYROSCOPE, REG_BANK_SEL, REG_BANK_0);
     int16_t x = I2CRead(GYROSCOPE, GYRO_X_MSB);
     x = x << 8;
     x |= I2CRead(GYROSCOPE, GYRO_X_LSB);
     float total = x;
-    return total / 250;
+    return total / GYRO_SCALE_FACTOR;
 }
 
 float gyroY(){
+    // ensure in USR0; maybe better as a check with I2CRead?
+    // I2CWrite(GYROSCOPE, REG_BANK_SEL, REG_BANK_0);
     int16_t y = I2CRead(GYROSCOPE, GYRO_Y_MSB);
     y = y << 8;
     y |= I2CRead(GYROSCOPE, GYRO_Y_LSB);
     float total = y;
-    return total / 250;
+    return total / GYRO_SCALE_FACTOR;
 }
 
 float gyroZ(){
+    // ensure in USR0; maybe better as a check with I2CRead?
+    // I2CWrite(GYROSCOPE, REG_BANK_SEL, REG_BANK_0);
     int16_t z = I2CRead(GYROSCOPE, GYRO_Z_MSB);
     z = z << 8;
     z |= I2CRead(GYROSCOPE, GYRO_Z_LSB);
     float total = z;
-    return total / 250;
+    return total / GYRO_SCALE_FACTOR;
+}
+
+float accelX()
+{
+  // ensure in USR0; maybe better as a check with I2CRead?
+  // I2CWrite(GYROSCOPE, REG_BANK_SEL, REG_BANK_0);
+  int16_t x = I2CRead(GYROSCOPE, ACCEL_X_MSB);
+  x = x << 8;
+  x |= I2CRead(GYROSCOPE, ACCEL_X_LSB);
+  float total = x;
+  return total / ACCEL_SCALE_FACTOR;
+}
+
+float accelY()
+{
+  // ensure in USR0; maybe better as a check with I2CRead?
+  // I2CWrite(GYROSCOPE, REG_BANK_SEL, REG_BANK_0);
+  int16_t y = I2CRead(GYROSCOPE, ACCEL_Y_MSB);
+  y = y << 8;
+  y |= I2CRead(GYROSCOPE, ACCEL_Y_LSB);
+  float total = y;
+  return total / ACCEL_SCALE_FACTOR;
+}
+
+float accelZ()
+{
+  // ensure in USR0; maybe better as a check with I2CRead?
+  // I2CWrite(GYROSCOPE, REG_BANK_SEL, REG_BANK_0);
+  int16_t z = I2CRead(GYROSCOPE, ACCEL_Z_MSB);
+  z = z << 8;
+  z |= I2CRead(GYROSCOPE, ACCEL_Z_LSB);
+  float total = z;
+  return total / ACCEL_SCALE_FACTOR;
+}
+
+float magX()
+{
+  // ensure in USR0; maybe better as a check with I2CRead?
+  // also only somewhat sure mag registers are in USR0
+  // I2CWrite(GYROSCOPE, REG_BANK_SEL, REG_BANK_0);
+  int16_t x = I2CRead(GYROSCOPE, MAG_X_MSB);
+  x = x << 8;
+  x |= I2CRead(GYROSCOPE, MAG_X_LSB);
+  float total = x;
+  return total / MAG_SCALE_FACTOR;
+}
+
+float magY()
+{
+  // ensure in USR0; maybe better as a check with I2CRead?
+  // also only somewhat sure mag registers are in USR0
+  // I2CWrite(GYROSCOPE, REG_BANK_SEL, REG_BANK_0);
+  int16_t y = I2CRead(GYROSCOPE, MAG_Y_MSB);
+  y = y << 8;
+  y |= I2CRead(GYROSCOPE, MAG_Y_LSB);
+  float total = y;
+  return total / MAG_SCALE_FACTOR;
+}
+
+float magZ()
+{
+  // ensure in USR0; maybe better as a check with I2CRead?
+  // also only somewhat sure mag registers are in USR0
+  // I2CWrite(GYROSCOPE, REG_BANK_SEL, REG_BANK_0);
+  int16_t z = I2CRead(GYROSCOPE, MAG_Z_MSB);
+  z = z << 8;
+  z |= I2CRead(GYROSCOPE, MAG_Z_LSB);
+  float total = z;
+  return total / MAG_SCALE_FACTOR;
 }
