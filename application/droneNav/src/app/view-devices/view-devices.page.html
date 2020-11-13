@@ -1,0 +1,22 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Select Drone</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ng-container *ngIf="deviceList.length==0">No devices found. Ensure the drone is powered on and within range.</ng-container>
+    <ion-item *ngFor="let d of deviceList" style="width: 100%">
+      <ion-button fill="clear" style="width: 100%" (click)="changeSelectedDevice(d)" [ngStyle]="{'color':selectedDevice === d ? 'blue' : 'black' }">
+        <ion-text style="text-align: center;" >{{d.name}}: {{d.id}}</ion-text>
+      </ion-button>
+    </ion-item>
+  </ion-list>
+  <ion-button expand="full" [class.button-disabled]="selectedDevice==null" (click)="connect()">
+    Connect!
+  </ion-button>
+  <ion-button expand="full" (click)="dismiss()">
+    Close
+  </ion-button>
+</ion-content>

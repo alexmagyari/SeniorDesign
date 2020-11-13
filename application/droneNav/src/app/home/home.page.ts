@@ -1,9 +1,17 @@
-import { Component } from '@angular/core';
+import { Component, NgZone} from '@angular/core';
 import { ViewChild, ElementRef } from '@angular/core';
 import { AlertController } from '@ionic/angular';
 import { Geolocation} from '@capacitor/core';
+import { Platform } from '@ionic/angular';
+import { BLE } from '@ionic-native/ble/ngx';
+import { ModalController } from '@ionic/angular';
+import { ViewDevicesPage } from '../view-devices/view-devices.page';
 
 declare var google: any;
+
+const GPS_SERVICE = 'ff10';
+const GPS_CHARACTERISTIC = 'ff00';
+
 
 @Component({
   selector: 'app-home',
@@ -44,11 +52,155 @@ export class HomePage {
   totalBatteryUsage: number = 0;
   totalMaxFlightTime: number = 0;
   droneName: string = "Not Connected";
+  drone: any = {};
 
-  constructor(public alertController: AlertController) {}
+  // Ble Vars
+  devices: any[] = [];
+  statusMessage: string;
+
+  constructor(public alertController: AlertController, public platform: Platform, 
+    private ble: BLE, 
+    private ngZone: NgZone, public modalController: ModalController) {}
 
   ionViewDidEnter(){
     this.showMap();
+  }
+
+  async getBLEDevices(){
+    if (this.platform.is("ios") || this.platform.is("android")){
+      this.setStatus('Scanning for Bluetooth LE Devices');
+      this.devices = [];  // clear list
+
+      // For testing on PC
+      // this.devices = 
+      // [
+      //   {
+      //     'name': "Drone",
+      //     'id': "IDIDIDIDID-10101010",
+      //     'rssi': -37
+      //   },
+      //   {
+      //     'name': "SomeSpeaker",
+      //     'id': "NOTTHEDRONE-2020202020",
+      //     'rssi': -60
+      //   },
+      //   {
+      //     'name': "AHeadPhone",
+      //     'id': "NOTTHEDRONE-EITHER2020202",
+      //     'rssi': -80
+      //   }
+      // ];
+      this.ble.scan([], 5).subscribe(
+        device => this.onDeviceDiscovered(device), 
+        error => this.scanError(error)
+      );
+
+      const alert = await this.alertController.create({
+        cssClass: 'alertClass',
+        header: "",
+        message: '<h1><ion-spinner name="crescent"></ion-spinner><br />Searching for Devices...</h1>',
+      });
+      await alert.present();
+
+      const modal = await this.modalController.create({
+        component: ViewDevicesPage,
+        componentProps: { 
+          parentPage: this,
+          deviceList: this.devices
+         }
+      });
+
+      setTimeout(this.setStatus.bind(this), 5000, 'Scan complete');
+      setTimeout(function(){
+
+        alert.dismiss();
+        modal.present();
+      }, 5000);
+
+      
+      
+    }
+    else{
+      this.presentBasicAlert("BLE only works on Android or iOS.");
+    }
+  }
+
+  connectToDevice(device){
+
+    this.setStatus('Connecting to ' + device.name || device.id);
+
+    this.ble.connect(device.id).subscribe(
+      drone => this.onConnected(drone),
+      drone => this.onDeviceDisconnected(drone)
+    );
+    
+  }
+
+  onConnected(peripheral) {
+    this.ngZone.run(() => {
+      this.setStatus('');
+      this.drone = peripheral;
+    });
+    this.writeGPSData();
+  }
+
+  writeGPSData() {
+    console.log('Writing GPS Data');
+    let buffer = this.convertMarkersToByteArray().buffer;
+    this.ble.write(this.drone.id, GPS_SERVICE, GPS_CHARACTERISTIC, buffer).then(
+      () => this.presentBasicAlert("Markers uploaded to drone. Please step away and prepare for launch."),
+      e => this.presentBasicAlert('Unexpected Error. Please reset drone and try again.')
+    );
+  }
+
+  convertMarkersToByteArray(){
+    let arr = new Uint8Array(this.markers.length * 10);
+    let c = 0;
+    this.markers.forEach(e => {
+      let b = this.toFloat32(e.latitude);
+      arr[c++] = (b & 0xFF000000) >>> 24;
+      arr[c++] = (b & 0x00FF0000) >>> 16;
+      arr[c++] = (b & 0x0000FF00) >> 8;
+      arr[c++] = (b & 0x000000FF);
+      console.log("Converted " + e.latitude + " to " + b.toString(16));
+      b = this.toFloat32(e.longitude);
+      arr[c++] = (b & 0xFF000000) >>> 24;
+      arr[c++] = (b & 0x00FF0000) >>> 16;
+      arr[c++] = (b & 0x0000FF00) >> 8;
+      arr[c++] = (b & 0x000000FF);
+      console.log("Converted " + e.longitude + " to " + b.toString(16));
+      b = e.hoverTime;
+      arr[c++] = (b & 0xFF00) >> 8;
+      arr[c++] = (b & 0x00FF);
+      console.log("Converted " + e.hoverTime + " to " + b.toString(16));
+    });
+    arr.forEach(e => {
+      console.log(e.toString(16));
+    })
+    return arr;
+  }
+
+  onDeviceDisconnected(peripheral) {
+    this.presentBasicAlert('The drone has been disconnected.');
+  }
+  
+  onDeviceDiscovered(device) {
+    console.log('Discovered ' + JSON.stringify(device, null, 2));
+    this.ngZone.run(() => {
+      this.devices.push(device);
+    });
+  }
+
+  setStatus(message) {
+    console.log(message);
+    this.ngZone.run(() => {
+      this.statusMessage = message;
+    });
+  }
+
+  scanError(error) {
+    this.setStatus('Error ' + error);
+    this.presentBasicAlert('Error scanning for Bluetooth low energy devices');
   }
 
   async getLocation(centerMap = false){
@@ -332,7 +484,9 @@ export class HomePage {
       this.presentBasicAlert("Battery usage exceeds 100%! Waypoints not uploaded to prevent drone crash.");
       return;
     }
+    this.getBLEDevices();
     for(var marker in this.markers){
+      
       console.log("Uploaded new marker to drone");
     }
   }
@@ -450,4 +604,34 @@ export class HomePage {
     await alert.present();
   }
 
+  toFloat32(value) {
+    var bytes = 0;
+    switch (value) {
+        case Number.POSITIVE_INFINITY: bytes = 0x7F800000; break;
+        case Number.NEGATIVE_INFINITY: bytes = 0xFF800000; break;
+        case +0.0: bytes = 0x40000000; break;
+        case -0.0: bytes = 0xC0000000; break;
+        default:
+            if (Number.isNaN(value)) { bytes = 0x7FC00000; break; }
+
+            if (value <= -0.0) {
+                bytes = 0x80000000;
+                value = -value;
+            }
+
+            var exponent = Math.floor(Math.log(value) / Math.log(2));
+            var significand = ((value / Math.pow(2, exponent)) * 0x00800000) | 0;
+
+            exponent += 127;
+            if (exponent >= 0xFF) {
+                exponent = 0xFF;
+                significand = 0;
+            } else if (exponent < 0) exponent = 0;
+
+            bytes = bytes | (exponent << 23);
+            bytes = bytes | (significand & ~(-1 << 23));
+        break;
+    }
+    return bytes;
+  }
 }

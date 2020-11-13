@@ -11,6 +11,10 @@ const routes: Routes = [
     redirectTo: 'home',
     pathMatch: 'full'
   },
+  {
+    path: 'view-devices',
+    loadChildren: () => import('./view-devices/view-devices.module').then( m => m.ViewDevicesPageModule)
+  },
 ];
 
 @NgModule({

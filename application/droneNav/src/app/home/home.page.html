@@ -27,7 +27,7 @@
         <ion-note slot="end" [color]="droneIsConnected() ? 'primary' : 'danger'">{{droneName}}</ion-note>
       </ion-item>
       <ion-item text-center >
-        <ion-button expand="block" style="width: 100%;" (click)="uploadWaypoints()" [class.button-disabled]="!droneIsConnected()">Upload Waypoints</ion-button>
+        <ion-button expand="block" style="width: 100%;" (click)="uploadWaypoints()">Upload Waypoints</ion-button>
       </ion-item>
       <ion-item text-center >
         <ion-button expand="block" style="width: 100%;" (click)="modifyParameters()">Modify Drone Parameters</ion-button>
