@@ -60,6 +60,7 @@
  *
   *****************************************************************************/
 /* DriverLib Defines */
+#include <gps.h>
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 
 /* Standard Defines */
@@ -71,7 +72,6 @@
 
 #include <i2cManager.h>
 #include <uartManager.h>
-#include <gpsManager.h>
 
 char* GPS_Input (void) {
 

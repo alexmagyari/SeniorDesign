@@ -1,0 +1,7 @@
+{
+  "name": "DroneControl",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

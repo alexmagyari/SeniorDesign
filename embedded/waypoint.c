@@ -8,6 +8,8 @@
 #include <string.h>
 #include <math.h>
 
+#include <waypoint.h>
+
 #define pi 3.14159265
 #define ratio 180/pi
 
@@ -110,18 +112,18 @@ struct waypoint setWaypoint (struct point startPoint, struct point desPoint) {
     printf("Distance is %f \n",GetDistance(begin, des));
     printf("Angle is %f degree\n",GetAngle(begin,des));
     printf("Turn direction from positive x-axis: %c\n",GetTurnDirection(begin, des));
-//   
-//    printf("Distance is %f\n",GetDistance(begin, des1));
-//    printf("Angle is %f degree\n",GetAngle(begin,des1));
-//    printf("Turn direction from positive x-axis: %c\n",GetTurnDirection(begin, des1));
-//   
-//    printf("Distance is %f\n",GetDistance(begin, des2));
-//    printf("Angle is %f degree\n",GetAngle(begin,des2));
-//    printf("Turn direction from positive x-axis: %c\n",GetTurnDirection(begin, des2));
-//   
-//    printf("Distance is %f\n",GetDistance(begin, des3));
-//    printf("Angle is %f degree\n",GetAngle(begin,des3));
-//    printf("Turn direction from positive x-axis: %c\n",GetTurnDirection(begin, des3));
+  
+   printf("Distance is %f\n",GetDistance(begin, des1));
+   printf("Angle is %f degree\n",GetAngle(begin,des1));
+   printf("Turn direction from positive x-axis: %c\n",GetTurnDirection(begin, des1));
+  
+   printf("Distance is %f\n",GetDistance(begin, des2));
+   printf("Angle is %f degree\n",GetAngle(begin,des2));
+   printf("Turn direction from positive x-axis: %c\n",GetTurnDirection(begin, des2));
+  
+   printf("Distance is %f\n",GetDistance(begin, des3));
+   printf("Angle is %f degree\n",GetAngle(begin,des3));
+   printf("Turn direction from positive x-axis: %c\n",GetTurnDirection(begin, des3));
 
 	struct waypoint test;
 	test = setWaypoint(begin, des);

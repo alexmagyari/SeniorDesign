@@ -5,8 +5,8 @@
  *      Author: Sang Nguyen
  */
 
-#ifndef GPSMANAGER_H_
-#define GPSMANAGER_H_
+#ifndef GPS_H_
+#define GPS_H_
 
 //Declare the gps structure
 struct location {
@@ -49,4 +49,4 @@ float ToLonDecimal(char c[], char d);
 struct location gpsTake();
 
 
-#endif /* GPSMANAGER_H_ */
+#endif /* GPS_H_ */
