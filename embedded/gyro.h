@@ -5,11 +5,9 @@
  *      Author: amag0
  *  Status: power mode?
  *            mode8 = 9DOF w opt DMP
- *          add sensor calibration methods?
+ *          **add sensor calibration methods?
  *          add check if IMU ready to be read?
- *          convert fns to use struct?
  *          add temp methods?
- *          figure out wth the DMP does
  */
 
 #ifndef GYRO_H_
@@ -114,28 +112,12 @@ typedef struct{
   float gx, gy, gz, ax, ay, az, mx, my, mz;
 } imuData;
 
-// *** Initialize the gyroscope
-void imu_init();
 
-// *** Return the 16 bit X rate from the gyro
-// Gyro angular rate = gyroOut/GyroSensitivity
-float gyroX();
+// *** Return 16 bit X,Y,Z readings from gyro, accel, and mag ***
+void get_gyro_data(imuData *data);
+void get_accel_data(imuData *data);
+void get_mag_data(imuData *data);
 
-// *** Return the 16 bit Y rate from the gyro
-float gyroY();
 
-// *** Return the 16 bit Z rate from the gyro
-float gyroZ();
-
-// *** Return 16 bit X,Y,Z readings from the accel
-// acceleration = accelOut/AccelSensitivity
-float accelX();
-float accelY();
-float accelZ();
-
-// *** Return 16 bit X,Y,Z readings from mag
-float magX();
-float magY();
-float magZ();
 
 #endif /* GYRO_H_ */

@@ -31,37 +31,30 @@ void imu_init(){
     I2CWrite(GYROSCOPE, ACCEL_CONFIG, ACCEL_FS_SEL);
 }
 
-float gyroX(){
-    // ensure in USR0; maybe better as a check with I2CRead?
-    // I2CWrite(GYROSCOPE, REG_BANK_SEL, REG_BANK_0);
-    int16_t x = I2CRead(GYROSCOPE, GYRO_X_MSB);
-    x = x << 8;
-    x |= I2CRead(GYROSCOPE, GYRO_X_LSB);
-    float total = x;
-    return total / GYRO_SCALE_FACTOR;
+void get_gyro_data(imuData *data)
+{
+  // ensure in USR0; maybe better as a check with I2CRead?
+  // I2CWrite(GYROSCOPE, REG_BANK_SEL, REG_BANK_0);
+  int16_t x = I2CRead(GYROSCOPE, GYRO_X_MSB);
+  x = x << 8;
+  x |= I2CRead(GYROSCOPE, GYRO_X_LSB);
+  float total = x;
+  data->gx = total / GYRO_SCALE_FACTOR;
+
+  int16_t y = I2CRead(GYROSCOPE, GYRO_Y_MSB);
+  y = y << 8;
+  y |= I2CRead(GYROSCOPE, GYRO_Y_LSB);
+  float total = y;
+  data->gy = total / GYRO_SCALE_FACTOR;
+
+  int16_t z = I2CRead(GYROSCOPE, GYRO_Z_MSB);
+  z = z << 8;
+  z |= I2CRead(GYROSCOPE, GYRO_Z_LSB);
+  float total = z;
+  data->gz = total / GYRO_SCALE_FACTOR;
 }
 
-float gyroY(){
-    // ensure in USR0; maybe better as a check with I2CRead?
-    // I2CWrite(GYROSCOPE, REG_BANK_SEL, REG_BANK_0);
-    int16_t y = I2CRead(GYROSCOPE, GYRO_Y_MSB);
-    y = y << 8;
-    y |= I2CRead(GYROSCOPE, GYRO_Y_LSB);
-    float total = y;
-    return total / GYRO_SCALE_FACTOR;
-}
-
-float gyroZ(){
-    // ensure in USR0; maybe better as a check with I2CRead?
-    // I2CWrite(GYROSCOPE, REG_BANK_SEL, REG_BANK_0);
-    int16_t z = I2CRead(GYROSCOPE, GYRO_Z_MSB);
-    z = z << 8;
-    z |= I2CRead(GYROSCOPE, GYRO_Z_LSB);
-    float total = z;
-    return total / GYRO_SCALE_FACTOR;
-}
-
-float accelX()
+void get_accel_data(imuData *data)
 {
   // ensure in USR0; maybe better as a check with I2CRead?
   // I2CWrite(GYROSCOPE, REG_BANK_SEL, REG_BANK_0);
@@ -69,32 +62,22 @@ float accelX()
   x = x << 8;
   x |= I2CRead(GYROSCOPE, ACCEL_X_LSB);
   float total = x;
-  return total / ACCEL_SCALE_FACTOR;
-}
+  data->ax = total / ACCEL_SCALE_FACTOR;
 
-float accelY()
-{
-  // ensure in USR0; maybe better as a check with I2CRead?
-  // I2CWrite(GYROSCOPE, REG_BANK_SEL, REG_BANK_0);
   int16_t y = I2CRead(GYROSCOPE, ACCEL_Y_MSB);
   y = y << 8;
   y |= I2CRead(GYROSCOPE, ACCEL_Y_LSB);
   float total = y;
-  return total / ACCEL_SCALE_FACTOR;
-}
+  data->ay = total / ACCEL_SCALE_FACTOR;
 
-float accelZ()
-{
-  // ensure in USR0; maybe better as a check with I2CRead?
-  // I2CWrite(GYROSCOPE, REG_BANK_SEL, REG_BANK_0);
   int16_t z = I2CRead(GYROSCOPE, ACCEL_Z_MSB);
   z = z << 8;
   z |= I2CRead(GYROSCOPE, ACCEL_Z_LSB);
   float total = z;
-  return total / ACCEL_SCALE_FACTOR;
+  data->az = total / ACCEL_SCALE_FACTOR;
 }
 
-float magX()
+void get_mag_data(imuData *data)
 {
   // ensure in USR0; maybe better as a check with I2CRead?
   // also only somewhat sure mag registers are in USR0
@@ -103,29 +86,17 @@ float magX()
   x = x << 8;
   x |= I2CRead(GYROSCOPE, MAG_X_LSB);
   float total = x;
-  return total / MAG_SCALE_FACTOR;
-}
+  data->mx = total / MAG_SCALE_FACTOR;
 
-float magY()
-{
-  // ensure in USR0; maybe better as a check with I2CRead?
-  // also only somewhat sure mag registers are in USR0
-  // I2CWrite(GYROSCOPE, REG_BANK_SEL, REG_BANK_0);
   int16_t y = I2CRead(GYROSCOPE, MAG_Y_MSB);
   y = y << 8;
   y |= I2CRead(GYROSCOPE, MAG_Y_LSB);
   float total = y;
-  return total / MAG_SCALE_FACTOR;
-}
+  data->my = total / MAG_SCALE_FACTOR;
 
-float magZ()
-{
-  // ensure in USR0; maybe better as a check with I2CRead?
-  // also only somewhat sure mag registers are in USR0
-  // I2CWrite(GYROSCOPE, REG_BANK_SEL, REG_BANK_0);
   int16_t z = I2CRead(GYROSCOPE, MAG_Z_MSB);
   z = z << 8;
   z |= I2CRead(GYROSCOPE, MAG_Z_LSB);
   float total = z;
-  return total / MAG_SCALE_FACTOR;
+  data->mz = total / MAG_SCALE_FACTOR;
 }
