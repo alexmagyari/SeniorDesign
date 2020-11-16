@@ -52,6 +52,12 @@
 /* Standard Includes */
 #include <stdint.h>
 #include <stdbool.h>
+<<<<<<< HEAD
+=======
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+>>>>>>> origin/GPS
 
 /* Board includes */
 #include <ti/devices/msp432p4xx/inc/msp.h>
@@ -62,13 +68,25 @@
 #include <uartManager.h>
 #include <i2cManager.h>
 #include <gyro.h>
+<<<<<<< HEAD
+=======
+#include "gps.h"
+
+
+struct location gps;
+>>>>>>> origin/GPS
 int main(void)
 {
     /*** Watchdog timer and clock set-up ***/
     WDTCTL = WDTPW | WDTHOLD;    // Stop Watchdog timer
     PCM->CTL0 = PCM_CTL0_KEY_VAL | PCM_CTL0_AMR__AM_LDO_VCORE1; // Enable correct voltage for 48MHZ
+<<<<<<< HEAD
                                                                 // Change line 71 in system_msp432p401r.c to 4
 ////
+=======
+//                                                                // Change line 71 in system_msp432p401r.c to 4
+//////
+>>>>>>> origin/GPS
     UART_init();
     I2C_init();
     initPWM(MOTOR_PWM_PERIOD, 0);
@@ -85,7 +103,73 @@ int main(void)
         c--;
     disarmMotors();
 
+<<<<<<< HEAD
   while (1){}
+=======
+
+
+
+
+  while (1){
+      gps = gpsTake();
+
+      UART2PCString("Latitude: ");
+      UART2PCString(gps.latitude);
+      UART2PCNewLine();
+      UART2PCString("Longitude: ");
+      UART2PCString(gps.longitude);
+      UART2PCNewLine();
+      UART2PCString("Longitude direction: ");
+      UART2PCChar(gps.lonDirection);
+      UART2PCNewLine();
+      UART2PCString("Latitude direction: ");
+      UART2PCChar(gps.latDirection);
+      UART2PCNewLine();
+      UART2PCString("Latitude in decimal: ");
+      UART2PCFloat(gps.LatDecimal);
+      UART2PCNewLine();
+      UART2PCString("Longitude in decimal: ");
+      UART2PCFloat(gps.LonDecimal);
+      UART2PCNewLine();
+      UART2PCNewLine();
+
+
+
+      float x = gyroX();
+      float y = gyroY();
+      float z = gyroZ();
+      char gyroOutput[] = "**** Gyro values: ****\0";
+      char gyroXc[] = "X: \0";
+      char gyroYc[] = "Y: \0";
+      char gyroZc[] = "Z: \0";
+      UART2PCString(gyroOutput);
+      UART2PCNewLine();
+      UART2PCString(gyroXc);
+      UART2PCFloat(x);
+      UART2PCNewLine();
+      UART2PCString(gyroYc);
+      UART2PCFloat(y);
+      UART2PCNewLine();
+      UART2PCString(gyroZc);
+      UART2PCFloat(z);
+      UART2PCNewLine();
+      UART2PCNewLine();
+      UART2PCNewLine();
+
+      char altitudeOutput[] = "*** Altitude Values***\0";
+              UART2PCString(altitudeOutput);
+              UART2PCNewLine();
+              char ao2[] = "Current Altitude: \0";
+              UART2PCString(ao2);
+              UART2PCFloat(altitude());
+              UART2PCNewLine();
+              char output[] = "Delta Altitude: \0";
+              UART2PCString(output);
+              UART2PCFloat(changeInAltitude());
+              UART2PCNewLine();
+              UART2PCNewLine();
+  }
+>>>>>>> origin/GPS
 //
 //    int c = 0;
 //    float x, y, z = 0;
