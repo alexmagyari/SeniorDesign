@@ -7,22 +7,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-
 #include <waypoint.h>
 
 #define pi 3.14159265
 #define ratio 180/pi
 
-struct point {
-	float x;
-	float y;
-};
-
-struct waypoint {
-	float distance;
-	float angle;	//angle is calculated from the positve side of x axis
-	char turnDir;	//turn direction, L = turn left, R = turn right 
-};
 
 double RadToDegree (double rad) {
 	double value = 180 / pi;
@@ -89,50 +78,5 @@ struct waypoint setWaypoint (struct point startPoint, struct point desPoint) {
 	temp. turnDir = GetTurnDirection(startPoint,desPoint);
 	return temp;
 }
-
- int main () {
-    struct point begin;
-    struct point des, des1, des2, des3;
-   
-    begin.x = 0;
-    begin.y = 0;
-   
-    des.x = 13.5;
-    des.y = 4.5;
-   
-    des1.x = -13.5;
-    des1.y = 4.5;
-   
-    des2.x = -13.5;
-    des2.y = -4.5;
-   
-    des3.x = 13.5;
-    des3.y = -4.5;
-   
-    printf("Distance is %f \n",GetDistance(begin, des));
-    printf("Angle is %f degree\n",GetAngle(begin,des));
-    printf("Turn direction from positive x-axis: %c\n",GetTurnDirection(begin, des));
-  
-   printf("Distance is %f\n",GetDistance(begin, des1));
-   printf("Angle is %f degree\n",GetAngle(begin,des1));
-   printf("Turn direction from positive x-axis: %c\n",GetTurnDirection(begin, des1));
-  
-   printf("Distance is %f\n",GetDistance(begin, des2));
-   printf("Angle is %f degree\n",GetAngle(begin,des2));
-   printf("Turn direction from positive x-axis: %c\n",GetTurnDirection(begin, des2));
-  
-   printf("Distance is %f\n",GetDistance(begin, des3));
-   printf("Angle is %f degree\n",GetAngle(begin,des3));
-   printf("Turn direction from positive x-axis: %c\n",GetTurnDirection(begin, des3));
-
-	struct waypoint test;
-	test = setWaypoint(begin, des);
-	
-	printf("Distance is %f \n",test.distance);
-	printf("Angle is %f degree\n",test.angle);
-    printf("Turn direction from positive x-axis: %c\n",test.turnDir);
-    
-    return(0);
- }
 
 
