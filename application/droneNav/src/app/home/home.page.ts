@@ -77,16 +77,19 @@ export class HomePage {
       //   {
       //     'name': "Drone",
       //     'id': "IDIDIDIDID-10101010",
+      //     'advertising': [2,1,6,3,3,15,24,8,9,66,97,116,116,101,114,121],
       //     'rssi': -37
       //   },
       //   {
       //     'name': "SomeSpeaker",
       //     'id': "NOTTHEDRONE-2020202020",
+      //     'advertising': [2,1,6,3,3,15,24,8,9,66,97,116,116,101,114,122],
       //     'rssi': -60
       //   },
       //   {
       //     'name': "AHeadPhone",
       //     'id': "NOTTHEDRONE-EITHER2020202",
+      //     'advertising': [2,1,6,3,3,15,24,8,9,66,97,116,116,101,114,123],
       //     'rssi': -80
       //   }
       // ];

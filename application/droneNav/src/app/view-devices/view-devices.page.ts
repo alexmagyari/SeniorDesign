@@ -10,20 +10,14 @@ export class ViewDevicesPage implements OnInit {
 
   parentPage = null;
   deviceList = [];
-  selectedDevice = null;
 
   constructor(public viewCtrl: ModalController) { }
 
-  connect(){
-    this.parentPage.connectToDevice(this.selectedDevice);
+  connect(dev){
+    this.parentPage.connectToDevice(dev);
     this.dismiss();
   }
   ngOnInit() {
-  }
-
-  changeSelectedDevice(dev){
-    this.selectedDevice = dev;
-    console.log("Set ID to " + dev.id);
   }
 
   dismiss() {
