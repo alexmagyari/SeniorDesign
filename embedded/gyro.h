@@ -13,6 +13,8 @@
 #ifndef GYRO_H_
 #define GYRO_H_
 
+#include <stdint.h>
+
 // The address of the gyro is 110100X, where X is ADC0, allowing
 // for two gyros to be connected. pin 0 is grounded for this connection
 #define GYROSCOPE 0x68
@@ -108,10 +110,51 @@ I'm assuming we call the change in gyro.c fns
 // #define CONT_MODE_4   0x10
 
 // *** Type Definitions ***
+// raw (but scaled) sensor data for accel, gyro
+typedef union {
+  struct{
+    int16_t X, Y, Z;
+  } __attribute__((packed)) axis;
+  int16_t data[3];
+} sensorRaw_t;
+
+// 'cleaned' sensor data
+typedef union {
+  struct{
+    float X, Y, Z;
+  } __attribute__((packed)) axis;
+  int16_t data[3];
+} sensor_t;
+
+// converted gyro angles
+typedef union {
+  struct {
+    float roll, pitch, yaw;
+  } __attribute__((packed)) axis;
+  float data[3];
+} gyroAngle_t;
+
+// magnetometer data
+typedef union {
+  struct {
+    float X, Y, Z;
+  } __attribute__((packed)) axis;
+  float data[3];
+} mag_t;
+
+// big struct to hold all of the above data types
 typedef struct{
-  float gx, gy, gz, ax, ay, az, mx, my, mz;
+  sensorRaw_t accel, gyro;  //raw readings
+  sensor_t accelBody;  //magnitude of accel in body frame
+  gyroAngle_t gyroRate; //gyro readings in dps
+  mag_t mag;  //mag data in microTeslas
 } imuData;
 
+// configuration struct to hold zero-vales
+extern imuData cfg;
+
+// get measures at rest to use as baseline
+void getZeroMeas(imuData *cfg);
 
 // *** Return 16 bit X,Y,Z readings from gyro, accel, and mag ***
 void get_gyro_data(imuData *data);

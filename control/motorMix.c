@@ -13,10 +13,11 @@ System Model
 Configuration: 'X'
 Forward Direction: x-axis (NED coordinates)
 
-m0 - Front Right // CCW
-m1 - Front Left  // CW
-m2 - Back Right  // CW
-m3 - Back Left   // CCW
+// double-check me
+m0 - Front Right // CW
+m1 - Front Left  // CCW
+m2 - Back Right  // CCW
+m3 - Back Left   // CW
 *****************************************************/
 
 void compute_motor_commands(float thrust_cmd, float yaw_cmd, float pitch_cmd, float roll_cmd)
