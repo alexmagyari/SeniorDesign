@@ -8,6 +8,8 @@
 #ifndef UARTMANAGER_H_
 #define UARTMANAGER_H_
 
+#define FIFO_SIZE 32
+
 
 // Initialize UART on ports 1.2 and 1.3
 void UART_init(void);
@@ -23,5 +25,8 @@ void UART2PCNewLine(void);
 
 // Send float to PC
 void UART2PCFloat(float data);
+
+// Convert buffer to float and empty buffer
+float uartFloatInput(void);
 
 #endif /* UARTMANAGER_H_ */

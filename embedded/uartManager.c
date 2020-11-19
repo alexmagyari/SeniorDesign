@@ -59,8 +59,11 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+#include <uartManager.h>
 #include <i2cManager.h>
 #include <motor.h>
+#include <FIFO.h>
+
 //![Simple UART Config]
 /* UART Configuration Parameter. These are the configuration parameters to
  * make the eUSCI A UART module to operate with a 9600 baud rate. These
@@ -83,6 +86,7 @@ const eUSCI_UART_ConfigV1 uartConfig =
 };
 //![Simple UART Config]
 
+fifo_t FIFO;
 
 void UART_init(void){
     /* Selecting P1.2 and P1.3 in UART mode */
@@ -104,6 +108,9 @@ void UART_init(void){
     MAP_Interrupt_enableInterrupt(INT_EUSCIA0);
     MAP_Interrupt_enableSleepOnIsrExit();
     MAP_Interrupt_enableMaster();
+
+    // Init buffer
+    FIFO = fifo_create(FIFO_SIZE, 1);
 }
 void UART2PCChar(uint8_t character){
     MAP_UART_transmitData(EUSCI_A0_BASE, character);
@@ -134,6 +141,23 @@ void UART2PCFloat(float data){
     }
 
 }
+
+float uartFloatInput(){
+    UART2PCNewLine();
+    char msg[] = "You sent: \0";
+    UART2PCString(msg);
+    char buf[FIFO_SIZE + 1] = "";
+    int i = 0;
+    while (!fifo_is_empty(FIFO)) {
+        fifo_get(FIFO, &buf[i]);
+        i++;
+      }
+    float f = (float)atof(buf);
+    UART2PCFloat(f);
+    UART2PCNewLine();
+    return f;
+}
+
 void EUSCIA0_IRQHandler(void)
 {
     uint32_t status = MAP_UART_getEnabledInterruptStatus(EUSCI_A0_BASE);
@@ -143,15 +167,20 @@ void EUSCIA0_IRQHandler(void)
     {
 
         uint8_t incomingData = MAP_UART_receiveData(EUSCI_A0_BASE);
-
-
         UART2PCChar(incomingData);
-        if (incomingData == '+')
-            armMotors();
-        if (incomingData == '-')
-            disarmMotors();
-        if (incomingData >= '0' && incomingData <= '9')
-            editMainPWM((incomingData - '0') * 10);
+
+        if (incomingData == (uint8_t)('\r'))
+            uartFloatInput();
+        else
+            fifo_add(FIFO, &incomingData);
+        // UART2PCChar(incomingData);
+
+//        if (incomingData == '+')
+//            armMotors();
+//        if (incomingData == '-')
+//            disarmMotors();
+//        if (incomingData >= '0' && incomingData <= '9')
+//            editMainPWM((incomingData - '0') * 10);
         MAP_Interrupt_disableSleepOnIsrExit();
         return;
     }
