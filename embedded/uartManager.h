@@ -9,7 +9,8 @@
 #define UARTMANAGER_H_
 
 #define FIFO_SIZE 32
-
+extern char UART_MAIL[FIFO_SIZE + 1];
+extern bool UART_HAS_MAIL;
 
 // Initialize UART on ports 1.2 and 1.3
 void UART_init(void);
@@ -18,7 +19,7 @@ void UART_init(void);
 void UART2PCString(char * data);
 
 // Send char to PC over UART
-void UART2PCChar(uint8_t character);
+void UART2PCChar(char character);
 
 // Send newline and carriage return to PC
 void UART2PCNewLine(void);
@@ -26,7 +27,8 @@ void UART2PCNewLine(void);
 // Send float to PC
 void UART2PCFloat(float data);
 
-// Convert buffer to float and empty buffer
-float uartFloatInput(void);
+// Convert buffer to m
+void uartFillMail(char * m);
 
+void UART_getMail(void);
 #endif /* UARTMANAGER_H_ */

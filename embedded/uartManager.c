@@ -63,7 +63,6 @@
 #include <i2cManager.h>
 #include <motor.h>
 #include <FIFO.h>
-
 //![Simple UART Config]
 /* UART Configuration Parameter. These are the configuration parameters to
  * make the eUSCI A UART module to operate with a 9600 baud rate. These
@@ -87,6 +86,12 @@ const eUSCI_UART_ConfigV1 uartConfig =
 //![Simple UART Config]
 
 fifo_t FIFO;
+bool UART_HAS_MAIL = false;
+char UART_MAIL[FIFO_SIZE + 1] = {0};
+
+void UART_getMail(){
+    UART_HAS_MAIL = false;
+}
 
 void UART_init(void){
     /* Selecting P1.2 and P1.3 in UART mode */
@@ -111,8 +116,10 @@ void UART_init(void){
 
     // Init buffer
     FIFO = fifo_create(FIFO_SIZE, 1);
+
+
 }
-void UART2PCChar(uint8_t character){
+void UART2PCChar(char character){
     MAP_UART_transmitData(EUSCI_A0_BASE, character);
 }
 
@@ -142,20 +149,15 @@ void UART2PCFloat(float data){
 
 }
 
-float uartFloatInput(){
-    UART2PCNewLine();
-    char msg[] = "You sent: \0";
-    UART2PCString(msg);
-    char buf[FIFO_SIZE + 1] = "";
+void uartFillMail(char * m){
+
     int i = 0;
     while (!fifo_is_empty(FIFO)) {
-        fifo_get(FIFO, &buf[i]);
+        fifo_get(FIFO, &m[i]);
         i++;
       }
-    float f = (float)atof(buf);
-    UART2PCFloat(f);
-    UART2PCNewLine();
-    return f;
+    m[i] = '\0';
+    UART_HAS_MAIL = true;
 }
 
 void EUSCIA0_IRQHandler(void)
@@ -170,7 +172,7 @@ void EUSCIA0_IRQHandler(void)
         UART2PCChar(incomingData);
 
         if (incomingData == (uint8_t)('\r'))
-            uartFloatInput();
+            uartFillMail( UART_MAIL);
         else
             fifo_add(FIFO, &incomingData);
         // UART2PCChar(incomingData);
