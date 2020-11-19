@@ -24,7 +24,7 @@ typedef struct {
 } pid_data;
 
 void pid_init(void);
-float pid_compute(float setpoint, float current, float dt, pid_data *pidType);
+float pid_compute(pid_data *pidType, float setpoint, float input, float dt);
 
 // might not need these?
 void pid_resetRPY(void);

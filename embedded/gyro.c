@@ -9,11 +9,6 @@
 #include <uartManager.h>
 #include "gyro.h"
 
-// not entirely sure if this is needed bc it might be set in init
-#define GYRO_SCALE_FACTOR   16.4f
-#define ACCEL_SCALE_FACTOR  4096.0f
-#define MAG_SCALE_FACTOR   0.15f
-
 void imu_init(){
     // ensure in USR0; maybe better as a check with I2CRead?
     // I2CWrite(GYROSCOPE, REG_BANK_SEL, USER_BANK_0);

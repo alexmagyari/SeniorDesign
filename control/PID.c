@@ -77,7 +77,7 @@ void initPID(void){
   pidY.lowPass.prevOutput = 0.0f;
 }
 
-float pid_compute(float setpoint, float current, float dt, pid_data *pid)
+float pid_compute(pid_data *pid, float setpoint, float current, float dt)
 {
   float err, pTerm, deltaErr, deriv, dTerm, output;
 

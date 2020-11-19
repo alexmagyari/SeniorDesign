@@ -1,7 +1,7 @@
 /*
 Author: Leslie Nix
 Date Created: 14 November 2020
-Date Updated: 16 November 2020
+Date Updated: 18 November 2020
 Status: Probably Fine
 */
 
@@ -25,7 +25,7 @@ void boardOrientation(sensorRaw_t *sensorRaw);
 // *** Rotates from NED to body frame ***
 void rotateV(sensor_t *v, const gyroAngle_t *angle);
 
-void convert_for_cntrl(imuData *data, gyroAngle_t *angle, mag_t *mag, float dt);
+void convert_for_cntrl(imuData *data, gyroAngle_t *angle, sensor_t *mag, float dt);
 
 
 #endif

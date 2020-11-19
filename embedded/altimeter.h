@@ -35,6 +35,12 @@
 #define ALTIMETER_PRESSURE_CSB 0x02
 #define ALTIMETER_PRESSURE_LSB 0x03
 
+typedef struct {
+  float groundAlt;  //in m
+  float absoluteAlt;  //in m
+  float deltaAlt;   //in m
+} baro_t;
+
 // Initialize altimeter
 void altimeter_init(void);
 

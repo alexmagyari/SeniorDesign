@@ -109,6 +109,11 @@ I'm assuming we call the change in gyro.c fns
 // #define CONT_MODE_3   0x06
 // #define CONT_MODE_4   0x10
 
+// *** Scale Factors ***
+#define GYRO_SCALE_FACTOR   16.4f
+#define ACCEL_SCALE_FACTOR  4096.0f
+#define MAG_SCALE_FACTOR   0.15f
+
 // *** Type Definitions ***
 // raw (but scaled) sensor data for accel, gyro
 typedef union {
@@ -147,7 +152,7 @@ typedef struct{
   sensorRaw_t accel, gyro;  //raw readings
   sensor_t accelBody;  //magnitude of accel in body frame
   gyroAngle_t gyroRate; //gyro readings in dps
-  mag_t mag;  //mag data in microTeslas
+  sensor_t mag;  //mag data in microTeslas
 } imuData;
 
 // configuration struct to hold zero-vales

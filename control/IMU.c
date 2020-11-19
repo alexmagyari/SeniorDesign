@@ -1,7 +1,7 @@
 /*
 Author: Leslie Nix
 Date Created: 14 November 2020
-Date Updated: 16 November 2020
+Date Updated: 18 November 2020
 Status: Probably Fine
 */
 
@@ -11,7 +11,7 @@ Status: Probably Fine
 #include "IMU.h"
 #include "lpfilter.h"
 
-static float calculateHeading(gyroAngle_t *angle, mag_t *mag);
+static float calculateHeading(gyroAngle_t *angle, sensor_t *mag);
 
 // *** Convert to NED Convention ***
 void boardOrientation(sensorRaw_t *sensorRaw)
@@ -22,7 +22,7 @@ void boardOrientation(sensorRaw_t *sensorRaw)
 }
 
 // *** Convert to SI Units and Filter ***
-void convert_for_cntrl(imuData *data, gyroAngle_t * angle, mag_t *mag, float dt)
+void convert_for_cntrl(imuData *data, gyroAngle_t * angle, sensor_t *mag, float dt)
 {
   // apply board orientation
   boardOrientation(&data->accel);
@@ -160,10 +160,27 @@ void rotateV(sensor_t *v, const gyroAngle_t *angle)
   v->axis.X = v_tmp.axis.X*rmat[0][2] + v_tmp.axis.Y*rmat[1][2] + v_tmp.axis.Z*rmat[2][2];
 }
 
-static float calculateHeading(gyroAngle_t *angle, mag_t *mag)
+static float calculateHeading(gyroAngle_t *angle, sensor_t *mag)
 {
   // calculate magnetic declination
   // +2 deg 12' for Houston, Tx on 18 Nov 2020
   static const int16_t magDeclinationCfg = -212;
-  // on line 127 in IMU.c o
+  static const int16_t deg = magDeclinationCfg / 100;
+  static const int16_t min = magDeclinationCfg % 100;
+  static const float magDeclin = (deg + ((float)min * (1.0f/60.0f)));
+
+  float cx = cosf(angle->axis.roll);
+  float sx = sinf(angle->axis.roll);
+  float cy = cosf(angle->axis.pitch);
+  float sy = sinf(angle->axis.pitch);
+
+  float Bfy = mag->axis.Z * sx - mag->axis.Y * cx;
+  float Bfx = mag->axis.X * cy + mag->axis.Y * sy * sx + mag->axis.Z * sy * cx;
+
+  // calculate heading
+  float heading = atan2f(Bfy,Bfx) * RAD_TO_DEG + magDeclin;
+
+  // keep heading in 0 to 360 range
+  if (heading < 0) heading += 360.0f;
+  return heading;
 }
