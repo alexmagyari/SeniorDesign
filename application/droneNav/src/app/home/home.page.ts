@@ -9,8 +9,8 @@ import { ViewDevicesPage } from '../view-devices/view-devices.page';
 
 declare var google: any;
 
-const GPS_SERVICE = 'ff10';
-const GPS_CHARACTERISTIC = 'ff00';
+const GPS_SERVICE = 'fff0';
+const GPS_CHARACTERISTIC = 'FFF3';
 
 
 @Component({
@@ -97,7 +97,7 @@ export class HomePage {
         device => this.onDeviceDiscovered(device), 
         error => this.scanError(error)
       );
-
+      
       const alert = await this.alertController.create({
         cssClass: 'alertClass',
         header: "",
@@ -121,7 +121,6 @@ export class HomePage {
       }, 5000);
 
       
-      
     }
     else{
       this.presentBasicAlert("BLE only works on Android or iOS.");
@@ -135,29 +134,47 @@ export class HomePage {
     this.ble.connect(device.id).subscribe(
       drone => this.onConnected(drone),
       drone => this.onDeviceDisconnected(drone)
-    );
+    )
+    // this.ble.startNotification(device.id,GPS_SERVICE,
+    //   GPS_CHARACTERISTIC).subscribe(
+    //   data => {this.onChange(data);})
+    
     
   }
 
+  onChange(data){
+    this.presentBasicAlert("New BLE Data: " + data);
+  }
+
   onConnected(peripheral) {
+    console.log("Connection successful")
     this.ngZone.run(() => {
       this.setStatus('');
       this.drone = peripheral;
     });
+
+    this.drone = peripheral;
+    this.setStatus("Connected to a " + (peripheral.name || peripheral.id));
     this.writeGPSData();
   }
 
   writeGPSData() {
-    console.log('Writing GPS Data');
-    let buffer = this.convertMarkersToByteArray().buffer;
-    this.ble.write(this.drone.id, GPS_SERVICE, GPS_CHARACTERISTIC, buffer).then(
-      () => this.presentBasicAlert("Markers uploaded to drone. Please step away and prepare for launch."),
-      e => this.presentBasicAlert('Unexpected Error. Please reset drone and try again.')
-    );
+    console.log('Writing GPS Data bb');
+    let buffer = this.convertMarkersToByteArray().buffer as ArrayBuffer;
+    for (let i = 0; i < Math.ceil(buffer.byteLength / 4); i++){ 
+      let max = i * 4 + 4;
+      let newBuffer = buffer.slice(i * 4, max);
+      console.log(newBuffer.byteLength);
+      console.log("Trying to send Array Buffer: " + String.fromCharCode.apply(null, new Uint16Array(newBuffer)));
+      this.ble.write(this.drone.id, GPS_SERVICE, GPS_CHARACTERISTIC, newBuffer).then(
+        () => console.log("Sent! " + newBuffer),
+        e => { if(e !== "136" ) this.presentBasicAlert('Unexpected Error. Please reset drone and try again. Error: ' + e) }
+      );
+    }
   }
 
   convertMarkersToByteArray(){
-    let arr = new Uint8Array(this.markers.length * 10);
+    let arr = new Uint8Array(this.markers.length * 12);
     let c = 0;
     this.markers.forEach(e => {
       let b = this.toFloat32(e.latitude);
@@ -173,13 +190,12 @@ export class HomePage {
       arr[c++] = (b & 0x000000FF);
       console.log("Converted " + e.longitude + " to " + b.toString(16));
       b = e.hoverTime;
+      arr[c++] = 0x00;
+      arr[c++] = 0x00;
       arr[c++] = (b & 0xFF00) >> 8;
       arr[c++] = (b & 0x00FF);
       console.log("Converted " + e.hoverTime + " to " + b.toString(16));
     });
-    arr.forEach(e => {
-      console.log(e.toString(16));
-    })
     return arr;
   }
 
