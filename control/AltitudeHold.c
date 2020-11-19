@@ -18,6 +18,9 @@ Status: Probably Fine
 #include "../embedded/motor.h"
 #include "../embedded/altimeter.h"
 
+#define MIN_MOTOR_OUT 1000
+#define MAX_MOTOR_OUT 1900
+
 static baro_t altimeter;
 static float altitudeSetpoint;
 static bool altHoldActive;
