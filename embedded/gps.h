@@ -23,6 +23,10 @@ struct location {
 //Read the output from GPS module and retrieve $GPGGA NMEA Format
 char* GPS_Input (void);
 
+char* Compass_Input (void);
+
+float heading_degree();
+
 //Read the GPS input and return Latitude in degree form
 char* getLati(char c[]);
 

@@ -23,8 +23,13 @@ struct point {
 struct waypoint {
 	float distance;	//in degree
 	float angle;	//angle is calculated from the positve side of x axis
-	char turnDir;	//turn direction, L = turn left, R = turn right 
+//	char turnDir;	//turn direction, L = turn left, R = turn right
 };
+
+float GetABS(float x);
+
+//function return the quarant of des
+int quadrant(struct point beg, struct point des);
 
 //function change angle to degree
 double RadToDegree (double rad);
@@ -36,7 +41,7 @@ float GetDistance (struct point beg, struct point des);
 float GetAngle (struct point beg, struct point des);
 
 //Function return direction for the angle. Left or Right of the x_axis
-char GetTurnDirection(struct point beg, struct point des);
+//char GetTurnDirection(struct point beg, struct point des);
 
 //function return the struct waypoint.
 struct waypoint setWaypoint(struct point startPoint, struct point desPoint);

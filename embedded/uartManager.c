@@ -104,6 +104,27 @@ void UART_init(void){
     MAP_Interrupt_enableInterrupt(INT_EUSCIA0);
     MAP_Interrupt_enableSleepOnIsrExit();
     MAP_Interrupt_enableMaster();
+
+
+    /* Selecting P1.2 and P1.3 in UART mode */
+        MAP_GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P3,
+                GPIO_PIN2 | GPIO_PIN3, GPIO_PRIMARY_MODULE_FUNCTION);
+
+        /* Setting DCO to 12MHz */
+        CS_setDCOCenteredFrequency(CS_DCO_FREQUENCY_12);
+
+        //![Simple UART Example]
+        /* Configuring UART Module */
+        MAP_UART_initModule(EUSCI_A2_BASE, &uartConfig);
+
+        /* Enable UART module */
+        MAP_UART_enableModule(EUSCI_A2_BASE);
+
+        /* Enabling interrupts */
+        MAP_UART_enableInterrupt(EUSCI_A2_BASE, EUSCI_A_UART_RECEIVE_INTERRUPT);
+        MAP_Interrupt_enableInterrupt(INT_EUSCIA0);
+        MAP_Interrupt_enableSleepOnIsrExit();
+        MAP_Interrupt_enableMaster();
 }
 void UART2PCChar(uint8_t character){
     MAP_UART_transmitData(EUSCI_A0_BASE, character);

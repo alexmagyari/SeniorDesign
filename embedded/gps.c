@@ -75,7 +75,6 @@
 
 char* GPS_Input (void) {
 
-
     MAP_I2C_setSlaveAddress(EUSCI_B0_BASE, 0x42);
     MAP_I2C_setMode(EUSCI_B0_BASE, EUSCI_B_I2C_RECEIVE_MODE);
     MAP_I2C_enableModule(EUSCI_B0_BASE);
@@ -107,6 +106,107 @@ char* GPS_Input (void) {
         }
     }
     return a;
+}
+
+char* Compass_Input (void) {
+
+    MAP_I2C_setSlaveAddress(EUSCI_B0_BASE, 0x42);
+    MAP_I2C_setMode(EUSCI_B0_BASE, EUSCI_B_I2C_RECEIVE_MODE);
+    MAP_I2C_enableModule(EUSCI_B0_BASE);
+
+    char* a;
+    while (1){
+        char result[70] = "$GPRMC,";
+        char* sample = "$GPRMC";
+        unsigned int i = 0;
+        char label[10] = "";
+        char r = MAP_I2C_masterReceiveSingleByte(EUSCI_B0_BASE);
+        if(r=='$'){
+            while (i<6){
+                strncat(label, &r, 1);
+                r = MAP_I2C_masterReceiveSingleByte(EUSCI_B0_BASE);
+                i++;
+            }
+            if(strcmp(label,sample) == 0){
+                i = 0;
+                while(i<66){
+                    r = MAP_I2C_masterReceiveSingleByte(EUSCI_B0_BASE);
+                    strncat(result, &r, 1);
+                    i++;
+                }
+            a = result;
+//            UART2PCString(a);
+            break;
+            }
+        }
+    }
+    return a;
+}
+
+//char* Compass_Input (void) {
+//
+//    MAP_I2C_setSlaveAddress(EUSCI_B0_BASE, 0x42);
+//    MAP_I2C_setMode(EUSCI_B0_BASE, EUSCI_B_I2C_RECEIVE_MODE);
+//    MAP_I2C_enableModule(EUSCI_B0_BASE);
+//
+//    UART2PCString("here");
+//    char* a;
+//    while (1){
+//        char result[70] = "$GPRMC,";
+//        char* sample = "$GPRMC";
+//        unsigned int i = 0;
+//        char label[10] = "";
+//        char r = MAP_UART_receiveData(EUSCI_A2_BASE);
+//        if(r=='$'){
+//            while (i<6){
+//                strncat(label, &r, 1);
+//                r = MAP_UART_receiveData(EUSCI_A2_BASE);
+//                i++;
+//            }
+//            if(strcmp(label,sample) == 0){
+//                i = 0;
+//                while(i<66){
+//                    r = MAP_UART_receiveData(EUSCI_A2_BASE);
+//                    strncat(result, &r, 1);
+//                    i++;
+//                }
+//            a = result;
+////            UART2PCString(a);
+//            break;
+//            }
+//        }
+//    }
+//    return a;
+//}
+
+float heading_degree(){
+    char* c = Compass_Input();
+    char e[100]="";
+    strcpy(e,c);
+    char* r;
+    unsigned int len = strlen(c);
+    int comma = 0;
+    char degree[100] = "";
+    int i;
+    UART2PCString(c);
+    for ( i = 0; i<len; i++){
+        char s = e[i];
+        if (s == ','){
+            comma++;
+        }
+        if (e[i] == ',' && comma == 7){
+            i++;
+            while (e[i] != ','){
+                strncat(degree, &e[i], 1);
+                i++;
+//                UART2PCString("here");
+            }
+            r = degree;
+            UART2PCString(r);
+        }
+    }
+    float degree_float = atof(r);
+    return degree_float;
 }
 
 char* getLati(char c[]) {
@@ -293,25 +393,13 @@ struct location gpsTake(){
 /*--------------------------------------------------
  * Copy following codes to main to retrieve the data
  * -------------------------------------------------
-        I2C_GPS_init(0x42);
+    //This function return struct gps which contains longitude, latitude in float
+    struct location gps = gpsTake();
 
-        char* input = GPS_Input();
-        char s[100];
-        char temp[20];
-        char t1 [20];
-        strcpy(s, input);
-            struct location gps;
-            strcpy(gps.latitude, getLati(s));
-            strcpy(gps.longitude, getLongi(s));
-            strcpy(gps.altitude, getAlti(s));
-            strcpy(gps.lonDirection, getLonDirection(s));
-            strcpy(gps.latDirection, getLatDirection(s));
-            strcpy(temp, gps.latitude);
-            strcpy(t1, gps.latDirection);
-            gps.LatDecimal = ToLatDecimal(temp, t1);
-            strcpy(temp, gps.longitude);
-            strcpy(t1, gps.lonDirection);
-            gps.LonDecimal = ToLonDecimal(temp, t1);
+    //This function return the heading degree of drone. This value is from GPS signal
+    //This heading degree respected to true north (0 degree).
+    float heading_degree = heading_degree();
+
  */
 /*-----------------------------------------------------
  * Copy following codes to main to test with terminal via UART
