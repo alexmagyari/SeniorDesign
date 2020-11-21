@@ -89,7 +89,7 @@ void armMotors()
 
     while (c < 50){
         int c1 = 0;
-        while (c1 < 10000) c1++;
+//        while (c1 < 10000) c1++;
         TA1CCR1 = c;
         TA1CCR2 = c;
         TA1CCR3 = c;

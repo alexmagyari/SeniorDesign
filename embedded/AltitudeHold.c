@@ -13,10 +13,10 @@ Status: Probably Fine
 #include "AltitudeHold.h"
 #include "IMU.h"
 #include "lpFilter.h"
-#include "../embedded/gyro.h"
+#include "gyro.h"
 #include "PID.h"
-#include "../embedded/motor.h"
-#include "../embedded/altimeter.h"
+#include "motor.h"
+#include "altimeter.h"
 
 #define MIN_MOTOR_OUT 1000
 #define MAX_MOTOR_OUT 1900

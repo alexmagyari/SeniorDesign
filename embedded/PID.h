@@ -14,6 +14,7 @@ Status: Probably Fine
 #define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
 
 typedef struct {
+  char desc[10];
   float kp;
   float ki;
   float kd;

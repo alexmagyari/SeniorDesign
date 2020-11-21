@@ -10,7 +10,7 @@ Flight Control and Stabilization Algorithms
 #ifndef ALTHOLD_H_
 #define ALTHOLD_H_
 
-#include "../embedded/gyro.h"
+#include "gyro.h"
 
 typedef struct {
   float altitude, velocity, acceleration;

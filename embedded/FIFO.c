@@ -155,20 +155,18 @@ bool checkPurgeFifo(fifo_t fifo){
     fifo_copy_from(fifo, tailString);
     fifo_copy_from(fifo, &tailString[1]);
     if (fifo->writeoffset == 0){
-        fifo->writeoffset = fifo->allocatedbytes;
+        fifo->writeoffset = fifo->allocatedbytes - fifo->itemsize;
     }
-    else
-    {
-        fifo->writeoffset -= fifo->itemsize;
-    }
-    if (fifo->writeoffset == 0)
+    else if (fifo->writeoffset - fifo->itemsize == 0)
     {
         fifo->writeoffset = fifo->allocatedbytes;
     }
     else
     {
         fifo->writeoffset -= fifo->itemsize;
+        fifo->writeoffset -= fifo->itemsize;
     }
+
     if ((tailString[0] == purgeString[0]) && (tailString[1] == purgeString[1]))
     {
         return true;

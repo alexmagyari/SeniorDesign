@@ -8,7 +8,7 @@
 #ifndef UARTMANAGER_H_
 #define UARTMANAGER_H_
 
-#define FIFO_SIZE 32
+#define FIFO_SIZE 1024
 extern char UART_MAIL[FIFO_SIZE + 1];
 extern bool UART_HAS_MAIL;
 

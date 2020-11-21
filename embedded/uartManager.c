@@ -169,7 +169,7 @@ void EUSCIA0_IRQHandler(void)
     {
 
         uint8_t incomingData = MAP_UART_receiveData(EUSCI_A0_BASE);
-        UART2PCChar(incomingData);
+        UART2PCChar((char)incomingData);
 
         if (incomingData == (uint8_t)('\r'))
             uartFillMail( UART_MAIL);

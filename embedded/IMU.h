@@ -9,7 +9,7 @@ Status: Probably Fine
 #ifndef IMU_H_
 #define IMU_H_
 
-#include "../embedded/gyro.h"
+#include "gyro.h"
 
 #define DEG_TO_RAD  0.017453292519943295769236907684886f
 #define RAD_TO_DEG  57.295779513082320876798154814105f

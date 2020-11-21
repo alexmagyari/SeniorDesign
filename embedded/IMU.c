@@ -27,8 +27,8 @@ void convert_for_cntrl(imuData *data, gyroAngle_t * angle, sensor_t *mag, float 
   // apply board orientation
   boardOrientation(&data->accel);
   boardOrientation(&data->gyro);
-
-  for (uint8_t axis = 0; axis < 3; axis++)
+  uint8_t axis = 0;
+  for (axis = 0; axis < 3; axis++)
   {
     // subtract zero values
     data->accel.data[axis] -= cfg.accel.data[axis];
@@ -54,7 +54,7 @@ void convert_for_cntrl(imuData *data, gyroAngle_t * angle, sensor_t *mag, float 
   // mag in microteslas -> ?
 
   static const float gyro_cf_factor = 600.0f;
-  static const float inv_gyro_cf_factor = (1.0f/(gyro_cf_factor + 1.0f));
+  static const float inv_gyro_cf_factor = (1.0f/(600.0f + 1.0f));
   static low_pass_t accel_lp[3] ={  // cutoff fr in Hz
     {.Fc = 53.05f},
     {.Fc = 53.05f},
@@ -64,8 +64,8 @@ void convert_for_cntrl(imuData *data, gyroAngle_t * angle, sensor_t *mag, float 
   sensor_t gyro;  // gyro readings in rad/s
   sensor_t accLP; //accel readings after lp filtering
   float accelMagSq = 0; //accel magnitude squared
-
-  for (uint8_t axis = 0; (axis = 3); axis++)
+  axis = 0;
+  for (axis = 0; (axis < 3); axis++)
   {
     gyro.data[axis] = data->gyroRate.data[axis] * DEG_TO_RAD;
     accLP.data[axis] = applyLowPass(&accel_lp[axis], data->accel.data[axis], dt);
@@ -80,7 +80,8 @@ void convert_for_cntrl(imuData *data, gyroAngle_t * angle, sensor_t *mag, float 
   // apply complimentary filter
   if (0.72f < accelMagSq && accelMagSq < 1.32f)
   {
-    for (uint8_t axis = 0; axis < 3; axis++)
+    axis = 0;
+    for (axis = 0; axis < 3; axis++)
     {
       data->accelBody.data[axis] = (data->accelBody.data[axis] * gyro_cf_factor + accLP.data[axis]) * inv_gyro_cf_factor;
     }
@@ -100,7 +101,7 @@ void convert_for_cntrl(imuData *data, gyroAngle_t * angle, sensor_t *mag, float 
 
   // complimentary filter factors for mag data
   static const float gyro_cfm_factor = 250.0f;
-  static const float inv_gyro_cfm_factor = (1.0f / (gyro_cfm_factor + 1.0f));
+  static const float inv_gyro_cfm_factor = (1.0f / (250.0f + 1.0f));
 
   // magnitude of earth's magnetic field in the body frame
   static sensor_t magBodyFrame;
@@ -109,7 +110,8 @@ void convert_for_cntrl(imuData *data, gyroAngle_t * angle, sensor_t *mag, float 
   rotateV(&magBodyFrame, &deltaAngle);
 
   // apply complimentary filter
-  for (uint8_t axis =0; axis < 3; axis++)
+  axis = 0;
+  for (axis =0; axis < 3; axis++)
   {
     magBodyFrame.data[axis] = (magBodyFrame.data[axis] * gyro_cfm_factor + mag->data[axis]) * inv_gyro_cfm_factor;
   }
