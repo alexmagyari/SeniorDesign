@@ -67,6 +67,8 @@
 #include <gyro.h>
 #include <gps.h>
 #include <PID.h>
+#include <IMU.h>
+#include <motorMix.h>
 
 // Practicing my bad practices
 struct location gps;
@@ -85,94 +87,99 @@ int main(void)
     pid_data PIDs[6] = { pidRoll, pidPitch, pidYaw, pidAlt, pidX, pidY };
 
     UART_init();
-
+    UART2PCString("Pitch: ");
     I2C_init();
     initPWM(MOTOR_PWM_PERIOD, 0);
     altimeter_init();
     imu_init();
+    int startup = 0;
+    while (startup < 1000)
+        startup++;
+    //Update init IMU
+    getZeroMeas(&_CFG);
 
-    volatile int32_t c = 4800000;
+    // currentIMU
+    imuData cIMU = _CFG;
+
+    int thrust = 20;
+
+    // Init Controls
+    cntrl_cmd controls;
+    controls.thrust_cmd = 0;
+    controls.roll_cmd = 0;
+    controls.pitch_cmd = 0;
+    controls.yaw_cmd = 0;
+
+    // Init Cotors
+    motor_mix motors;
+    motors.thrust = 0;
+    motors.roll = 0;
+    motors.pitch = 0;
+    motors.yaw = 0;
+
+    motors.m0 = 0;
+    motors.m1 = 0;
+    motors.m2 = 0;
+    motors.m3 = 0;
+
+    motors.m0_duty = MIN_MAIN_MOTOR_PWM;
+    motors.m1_duty = MIN_MAIN_MOTOR_PWM;
+    motors.m2_duty = MIN_MAIN_MOTOR_PWM;
+    motors.m3_duty = MIN_MAIN_MOTOR_PWM;
+    UART2PCString("Pitch: ");
+    int volatile c = 4800000;
     while (c != 0)
         c--;
+
     armMotors();
-    editMainPWM(20);
-//    c = 10000000;
-//    while (c != 0)
-//        c--;
-//    disarmMotors();
+    editMainPWM(MIN_MAIN_MOTOR_PWM);
+    c = 4800000;
+    while (c <= 0)
+        c--;
+    printPIDs(PIDs);
 
-    // PID Tuner
+    float dt = 10;
 
     while (1)
     {
+        //Update gyro
 
-        printPIDs(PIDs);
-        while (!UART_HAS_MAIL)
-            ;
-        UART_getMail();
+        get_gyro_data(&cIMU);
+        get_mag_data(&cIMU);
+        get_accel_data(&cIMU);
+
+        //Compute roll
+        //controls.roll_cmd = pid_compute(PIDs, 0.0f, cIMU.gyroRate.data[0], dt);
+
+        UART2PCString("GyroRate: ");
+        UART2PCFloat(cIMU.gyroRate.axis.pitch);
         UART2PCNewLine();
-        updatePIDs(PIDs);
-    }
 
-    while (1)
-    {
+        convert_for_cntrl(&cIMU, &(cIMU.gyroRate), &(cIMU.mag), dt);
 
-//        gps = gpsTake();
-//
-//        UART2PCString("Latitude: \0");
-//        UART2PCString(strcat(gps.latitude, "\0"));
-//        UART2PCNewLine();
-//        UART2PCString("Longitude: \0");
-//        UART2PCString(strcat(gps.longitude, "\0"));
-//        UART2PCNewLine();
-//        UART2PCString("Longitude direction: \0");
-//        UART2PCChar((char)*gps.lonDirection);
-//        UART2PCNewLine();
-//        UART2PCString("Latitude direction: \0");
-//        UART2PCChar((char)*gps.latDirection);
-//        UART2PCNewLine();
-//        UART2PCString("Latitude in decimal: \0");
-//        UART2PCFloat(gps.LatDecimal);
-//        UART2PCNewLine();
-//        UART2PCString(strcat("Longitude in decimal: ", "\0"));
-//        UART2PCFloat(gps.LonDecimal);
-//        UART2PCNewLine();
-//        UART2PCNewLine();
-//
-//        float x = gyroX();
-//        float y = gyroY();
-//        float z = gyroZ();
-//        char gyroOutput[] = "**** Gyro values: ****\0";
-//        char gyroXc[] = "X: \0";
-//        char gyroYc[] = "Y: \0";
-//        char gyroZc[] = "Z: \0";
-//        UART2PCString(gyroOutput);
-//        UART2PCNewLine();
-//        UART2PCString(gyroXc);
-//        UART2PCFloat(x);
-//        UART2PCNewLine();
-//        UART2PCString(gyroYc);
-//        UART2PCFloat(y);
-//        UART2PCNewLine();
-//        UART2PCString(gyroZc);
-//        UART2PCFloat(z);
-//        UART2PCNewLine();
-//        UART2PCNewLine();
-//        UART2PCNewLine();
-//
-//        char altitudeOutput[] = "*** Altitude Values***\0";
-//        UART2PCString(altitudeOutput);
-//        UART2PCNewLine();
-//        char ao2[] = "Current Altitude: \0";
-//        UART2PCString(ao2);
-//        UART2PCFloat(altitude());
-//        UART2PCNewLine();
-//        char output[] = "Delta Altitude: \0";
-//        UART2PCString(output);
-//        UART2PCFloat(changeInAltitude());
-//        UART2PCNewLine();
-//        UART2PCNewLine();
 
+        // Update motor speeds
+
+        controls.pitch_cmd = pid_compute(&PIDs[1], 0,
+                                                 cIMU.gyroRate.axis.pitch, dt);
+
+        compute_motor_commands(motors, 0, 0, controls.pitch_cmd, 0);
+        editMotorPWM(0, motors.m0_duty + thrust);
+        editMotorPWM(1, motors.m1_duty + thrust);
+        editMotorPWM(2, motors.m2_duty + thrust);
+        editMotorPWM(3, motors.m3_duty + thrust);
+        UART2PCString("Pitch: ");
+        UART2PCFloat(controls.pitch_cmd);
+        UART2PCNewLine();
+
+        if (UART_HAS_MAIL)
+        {
+            UART_getMail();
+            UART2PCNewLine();
+            updatePIDs(PIDs);
+            printPIDs(PIDs);
+
+        }
     }
 
     return 0;

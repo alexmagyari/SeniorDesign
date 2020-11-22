@@ -9,6 +9,7 @@
 #include <uartManager.h>
 #include "gyro.h"
 
+imuData _CFG;
 void imu_init(){
     // ensure in USR0; maybe better as a check with I2CRead?
     // I2CWrite(GYROSCOPE, REG_BANK_SEL, USER_BANK_0);
@@ -29,7 +30,7 @@ void imu_init(){
 void get_gyro_data(imuData *data)
 {
   // ensure in USR0; maybe better as a check with I2CRead?
-  // I2CWrite(GYROSCOPE, REG_BANK_SEL, USER_BANK_0);
+  I2CWrite(GYROSCOPE, REG_BANK_SEL, USER_BANK_0);
   int16_t x = I2CRead(GYROSCOPE, GYRO_X_MSB);
   x = x << 8;
   x |= I2CRead(GYROSCOPE, GYRO_X_LSB);
@@ -41,18 +42,18 @@ void get_gyro_data(imuData *data)
   y |= I2CRead(GYROSCOPE, GYRO_Y_LSB);
   float totalY = y;
   data->gyro.axis.Y = totalY / GYRO_SCALE_FACTOR;
-
   int16_t z = I2CRead(GYROSCOPE, GYRO_Z_MSB);
   z = z << 8;
   z |= I2CRead(GYROSCOPE, GYRO_Z_LSB);
   float totalZ = z;
   data->gyro.axis.Z = totalZ / GYRO_SCALE_FACTOR;
+
 }
 
 void get_accel_data(imuData *data)
 {
   // ensure in USR0; maybe better as a check with I2CRead?
-  // I2CWrite(GYROSCOPE, REG_BANK_SEL, REG_BANK_0);
+//  I2CWrite(GYROSCOPE, REG_BANK_SEL, REG_BANK_0);
   int16_t x = I2CRead(GYROSCOPE, ACCEL_X_MSB);
   x = x << 8;
   x |= I2CRead(GYROSCOPE, ACCEL_X_LSB);

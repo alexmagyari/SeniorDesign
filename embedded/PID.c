@@ -7,6 +7,8 @@
 
 #include "PID.h"
 #include <string.h>
+#include <stdbool.h>
+#include <uartManager.h>
 pid_data pidRoll, pidPitch, pidYaw, pidAlt, pidX, pidY;
 
 void pid_init(void)
@@ -86,6 +88,9 @@ void pid_init(void)
 
 float pid_compute(pid_data *pid, float setpoint, float current, float dt)
 {
+    UART2PCString("Error: ");
+            UART2PCFloat(setpoint - current);
+            UART2PCNewLine();
     float err, pTerm, deltaErr, deriv, dTerm, output;
 
     // calc error
@@ -94,9 +99,10 @@ float pid_compute(pid_data *pid, float setpoint, float current, float dt)
     // calc P-Term
     pTerm = pid->kp * err;
 
+
     // calc I-Term
     // trapezoidal integration
-    pid->iTerm += pid->ki * (err + pid->lastErr) / 2.0f * dt;
+    pid->iTerm += pid->ki * (err + pid->lastErr) / (2.0f * dt);
     // clamping for anti-windup
     pid->iTerm = constrain(pid->iTerm, -pid->intLim, pid->intLim);
 
@@ -111,7 +117,9 @@ float pid_compute(pid_data *pid, float setpoint, float current, float dt)
     dTerm = pid->kd * deriv;
 
     output = (pTerm + pid->iTerm + dTerm);
-
+    UART2PCString("PIDOutput: ");
+            UART2PCFloat(output);
+            UART2PCNewLine();
     /*
      if(pid->max < output)
      {

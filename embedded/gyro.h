@@ -127,8 +127,8 @@ typedef union {
 typedef union {
   struct{
     float X, Y, Z;
-  } __attribute__((packed)) axis;
-  int16_t data[3];
+  } axis;
+  float data[3];
 } sensor_t;
 
 // converted gyro angles
@@ -156,7 +156,7 @@ typedef struct{
 } imuData;
 
 // configuration struct to hold zero-vales
-extern imuData cfg;
+extern imuData _CFG;
 
 // get measures at rest to use as baseline
 void getZeroMeas(imuData *cfg);
