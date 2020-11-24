@@ -4,6 +4,7 @@
  *  Created on: Sep 30, 2020
  *      Author: Alex Magyari
  */
+#include <stdbool.h>
 
 #ifndef UARTMANAGER_H_
 #define UARTMANAGER_H_

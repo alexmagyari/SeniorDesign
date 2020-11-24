@@ -22,18 +22,31 @@ m3 - Back Left   // CW
 #include "./motor.h"
 #include "IMU.h"
 #include "motorMix.h"
-
+#include <uartManager.h>
 void compute_motor_commands(motor_mix m_cmd, float thrust_cmd, float yaw_cmd, float pitch_cmd, float roll_cmd)
 {
-  m_cmd.m0 = thrust_cmd + yaw_cmd + pitch_cmd + roll_cmd;
-  m_cmd.m1 = thrust_cmd - yaw_cmd + pitch_cmd - roll_cmd;
-  m_cmd.m2 = thrust_cmd - yaw_cmd - pitch_cmd + roll_cmd;
-  m_cmd.m3 = thrust_cmd + yaw_cmd - pitch_cmd - roll_cmd;
+  m_cmd.m0 = thrust_cmd + yaw_cmd + pitch_cmd + roll_cmd + 200;
+  m_cmd.m1 = thrust_cmd - yaw_cmd + pitch_cmd - roll_cmd + 200;
+  m_cmd.m2 = thrust_cmd - yaw_cmd - pitch_cmd + roll_cmd + 200;
+  m_cmd.m3 = thrust_cmd + yaw_cmd - pitch_cmd - roll_cmd + 200;
 
-  m_cmd.m0_duty = (m_cmd.m0 / MAX_MOTOR_OUT) * (MOTOR_PWM_PERIOD - MIN_MAIN_MOTOR_PWM) * 100;
-  m_cmd.m1_duty = (m_cmd.m1 / MAX_MOTOR_OUT) * (MOTOR_PWM_PERIOD - MIN_MAIN_MOTOR_PWM) * 100;
-  m_cmd.m2_duty = (m_cmd.m2 / MAX_MOTOR_OUT) * (MOTOR_PWM_PERIOD - MIN_MAIN_MOTOR_PWM) * 100;
-  m_cmd.m3_duty = (m_cmd.m3 / MAX_MOTOR_OUT) * (MOTOR_PWM_PERIOD - MIN_MAIN_MOTOR_PWM) * 100;
+  m_cmd.m0_duty = ((m_cmd.m0 / 400) * (MOTOR_PWM_PERIOD - MIN_MAIN_MOTOR_PWM) * 100 + MIN_MAIN_MOTOR_PWM * 100) / MOTOR_PWM_PERIOD;
+  m_cmd.m1_duty = ((m_cmd.m1 / 400) * (MOTOR_PWM_PERIOD - MIN_MAIN_MOTOR_PWM) * 100 + MIN_MAIN_MOTOR_PWM * 100) / MOTOR_PWM_PERIOD;
+  m_cmd.m2_duty = ((m_cmd.m2 / 400) * (MOTOR_PWM_PERIOD - MIN_MAIN_MOTOR_PWM) * 100 + MIN_MAIN_MOTOR_PWM * 100) / MOTOR_PWM_PERIOD;
+  m_cmd.m3_duty = ((m_cmd.m3 / 400) * (MOTOR_PWM_PERIOD - MIN_MAIN_MOTOR_PWM) * 100 + MIN_MAIN_MOTOR_PWM * 100) / MOTOR_PWM_PERIOD;
+
+  UART2PCString("M0 Duty: ");
+  UART2PCFloat (m_cmd.m0_duty);
+  UART2PCNewLine();
+  UART2PCString("M1 Duty: ");
+  UART2PCFloat(m_cmd.m1_duty);
+  UART2PCNewLine();
+  UART2PCString("M2 Duty: ");
+  UART2PCFloat(m_cmd.m2_duty);
+  UART2PCNewLine();
+  UART2PCString("M3 Duty: ");
+  UART2PCFloat(m_cmd.m3_duty);
+  UART2PCNewLine();
 
   if (m_cmd.m0_duty > 100) m_cmd.m0_duty = 100;
   if (m_cmd.m1_duty > 100) m_cmd.m1_duty = 100;

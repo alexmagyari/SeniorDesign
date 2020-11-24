@@ -103,15 +103,15 @@ I'm assuming we call the change in gyro.c fns
 #define MAG_CNTL_2     0x31
 
 // Set power mode to something?
-// #define SNGL_MODE     0x01
-// #define CONT_MODE_1   0x02
-// #define CONT_MODE_2   0x04
-// #define CONT_MODE_3   0x06
-// #define CONT_MODE_4   0x10
+ #define SNGL_MODE     0x01
+ #define CONT_MODE_1   0x02
+ #define CONT_MODE_2   0x04
+ #define CONT_MODE_3   0x06
+ #define CONT_MODE_4   0x10
 
 // *** Scale Factors ***
-#define GYRO_SCALE_FACTOR   16.4f
-#define ACCEL_SCALE_FACTOR  4096.0f
+#define GYRO_SCALE_FACTOR   131
+#define ACCEL_SCALE_FACTOR  16384
 #define MAG_SCALE_FACTOR   0.15f
 
 // *** Type Definitions ***
@@ -119,7 +119,7 @@ I'm assuming we call the change in gyro.c fns
 typedef union {
   struct{
     int16_t X, Y, Z;
-  } __attribute__((packed)) axis;
+  } axis;
   int16_t data[3];
 } sensorRaw_t;
 

@@ -151,23 +151,19 @@ int main(void)
         //Compute roll
         //controls.roll_cmd = pid_compute(PIDs, 0.0f, cIMU.gyroRate.data[0], dt);
 
-        UART2PCString("GyroRate: ");
-        UART2PCFloat(cIMU.gyroRate.axis.pitch);
-        UART2PCNewLine();
-
         convert_for_cntrl(&cIMU, &(cIMU.gyroRate), &(cIMU.mag), dt);
-
 
         // Update motor speeds
 
-        controls.pitch_cmd = pid_compute(&PIDs[1], 0,
-                                                 cIMU.gyroRate.axis.pitch, dt);
+        controls.pitch_cmd = pid_compute(&PIDs[1], 0, cIMU.gyroRate.axis.pitch,
+                                         dt);
 
         compute_motor_commands(motors, 0, 0, controls.pitch_cmd, 0);
-        editMotorPWM(0, motors.m0_duty + thrust);
-        editMotorPWM(1, motors.m1_duty + thrust);
-        editMotorPWM(2, motors.m2_duty + thrust);
-        editMotorPWM(3, motors.m3_duty + thrust);
+        editMotorPWM(0, motors.m0_duty);
+        editMotorPWM(1, motors.m1_duty);
+        editMotorPWM(2, motors.m2_duty);
+        editMotorPWM(3, motors.m3_duty);
+
         UART2PCString("Pitch: ");
         UART2PCFloat(controls.pitch_cmd);
         UART2PCNewLine();

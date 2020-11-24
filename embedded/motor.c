@@ -49,6 +49,11 @@ void initPWM(int period, int startDuty){
 }
 
 void editMotorPWM(int motor, int duty){
+    if (duty > 100)
+        duty = 100;
+    if (duty < 0)
+        duty = 0;
+    duty = duty * MOTOR_PWM_PERIOD / 100;
     switch (motor){
     case 0:
         TA1CCR1 = duty;

@@ -88,9 +88,7 @@ void pid_init(void)
 
 float pid_compute(pid_data *pid, float setpoint, float current, float dt)
 {
-    UART2PCString("Error: ");
-            UART2PCFloat(setpoint - current);
-            UART2PCNewLine();
+
     float err, pTerm, deltaErr, deriv, dTerm, output;
 
     // calc error
@@ -120,6 +118,9 @@ float pid_compute(pid_data *pid, float setpoint, float current, float dt)
     UART2PCString("PIDOutput: ");
             UART2PCFloat(output);
             UART2PCNewLine();
+            UART2PCString("Error: ");
+                    UART2PCFloat(err);
+                    UART2PCNewLine();
     /*
      if(pid->max < output)
      {

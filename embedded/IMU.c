@@ -37,15 +37,20 @@ void convert_for_cntrl(imuData *data, gyroAngle_t * angle, sensor_t *mag,
 
     uint8_t axis = 0;
 
+
     for (axis = 0; axis < 3; axis++)
     {
         // subtract zero values
         data->accel.data[axis] -= _CFG.accel.data[axis];
-        data->gyro.data[axis] -= _CFG.accel.data[axis];
+        data->gyro.data[axis] -= _CFG.gyro.data[axis];
         // convert gyro readings to rad/s
+
         data->gyroRate.data[axis] = (float) (data->gyro.data[axis]);
 
     }
+//    UART2PCString("Gyro Data ");
+//    UART2PCFloat(data->gyroRate.data[1]);
+//    UART2PCNewLine();
     /*
 
      // gyro in dps -> rad/s
@@ -71,57 +76,54 @@ void convert_for_cntrl(imuData *data, gyroAngle_t * angle, sensor_t *mag,
     float accelMagSq = 0; //accel magnitude squared
     axis = 0;
 
-    UART2PCString("DA X: ");
-    UART2PCFloat(data->gyroRate.data[0]);
-    UART2PCNewLine();
-    UART2PCString("DA Y: ");
-    UART2PCFloat(data->gyroRate.data[1]);
-    UART2PCNewLine();
-    UART2PCString("DA Z: ");
-    UART2PCFloat(data->gyroRate.data[2]);
-    UART2PCNewLine();
+//    UART2PCString("DA X: ");
+//    UART2PCFloat(data->gyroRate.data[0]);
+//    UART2PCNewLine();
+//    UART2PCString("DA Y: ");
+//    UART2PCFloat(data->gyroRate.data[1]);
+//    UART2PCNewLine();
+//    UART2PCString("DA Z: ");
+//    UART2PCFloat(data->gyroRate.data[2]);
+//    UART2PCNewLine();
     for (axis = 0; axis < 3; axis++)
     {
         gyro.data[axis] = data->gyroRate.data[axis] * DEG_TO_RAD;
-        UART2PCString("Gyro Data: ");
-        UART2PCFloat(gyro.data[axis]);
-        UART2PCNewLine();
+
         accLP.data[axis] = applyLowPass(&accel_lp[axis], data->accel.data[axis],
                                         dt);
-        UART2PCString("Gyro Data after LP: ");
-        UART2PCFloat(gyro.data[axis]);
-        UART2PCNewLine();
-        accelMagSq += accLP.data[axis] * accLP.data[axis];
-        UART2PCString("Gyro Data after accelMagSq: ");
-        UART2PCFloat(gyro.data[axis]);
-        UART2PCNewLine();
+        data->accelBody.data[axis] = accLP.data[axis];
+
 
     }
-    UART2PCString("DA X: ");
-    UART2PCFloat(gyro.axis.X);
-    UART2PCNewLine();
-    UART2PCString("DA Data int: ");
-    UART2PCFloat(gyro.data[0]);
-    UART2PCNewLine();
-    UART2PCString("DA Y: ");
-    UART2PCFloat(gyro.axis.Y);
-    UART2PCNewLine();
-    UART2PCString("DA Data inta: ");
-    UART2PCFloat(gyro.data[1]);
-    UART2PCNewLine();
-    UART2PCString("DA Z: ");
-    UART2PCFloat(gyro.axis.Z);
-    UART2PCNewLine();
-    UART2PCString("DA Data Z: ");
-    UART2PCFloat(gyro.data[2]);
-    UART2PCNewLine();
+//    UART2PCString("DA X: ");
+//    UART2PCFloat(gyro.axis.X);
+//    UART2PCNewLine();
+//    UART2PCString("DA Data int: ");
+//    UART2PCFloat(gyro.data[0]);
+//    UART2PCNewLine();
+//    UART2PCString("DA Y: ");
+//    UART2PCFloat(gyro.axis.Y);
+//    UART2PCNewLine();
+//    UART2PCString("DA Data inta: ");
+//    UART2PCFloat(gyro.data[1]);
+//    UART2PCNewLine();
+//    UART2PCString("DA Z: ");
+//    UART2PCFloat(gyro.axis.Z);
+//    UART2PCNewLine();
+//    UART2PCString("DA Data Z: ");
+//    UART2PCFloat(gyro.data[2]);
+//    UART2PCNewLine();
 
     // find angle by which to rotate body frame
     gyroAngle_t deltaAngle = { .data = { gyro.axis.X * dt, gyro.axis.Y * dt,
                                          gyro.axis.Z * dt } };
 
+
     rotateV(&(data->accelBody), &deltaAngle); // rotate body frame
 
+    UART2PCString("After rotateV..: ");
+    UART2PCFloat(data->gyroRate.data[1]);
+    UART2PCNewLine();
     // if <0.85G or >1.15, skip new accel readings
     // apply complimentary filter
 
@@ -146,17 +148,17 @@ void convert_for_cntrl(imuData *data, gyroAngle_t * angle, sensor_t *mag,
 
 #else
 
-    angle->axis.roll = atan2f(
-            -(data->accelBody.axis.Y),
-            sqrtf(abs(
-                    data->accelBody.axis.X * data->accelBody.axis.X
-                            + data->accelBody.axis.Z
-                                    * data->accelBody.axis.Z)));
+    angle->axis.roll = atan2f( -(data->accelBody.axis.Y),
+                               sqrtf(abs(
+                                     data->accelBody.axis.X * data->accelBody.axis.X
+                                   + data->accelBody.axis.Z * data->accelBody.axis.Z)));
 
-    double __X = (double) data->accelBody.axis.X;
-    double __Z = (double) -1 * (double) data->accelBody.axis.Z;
 
-    angle->axis.pitch = (double) atan2f(__X, __Z);
+    float __X = data->accelBody.axis.X;
+    float __Z = -1 * data->accelBody.axis.Z;
+
+    angle->axis.pitch = atan2f(__X, __Z);
+
 
 #endif
 
@@ -169,7 +171,6 @@ void convert_for_cntrl(imuData *data, gyroAngle_t * angle, sensor_t *mag,
 
     // rotate body frame
     rotateV(&magBodyFrame, &deltaAngle);
-
     // apply complimentary filter
     axis = 0;
     for (axis = 0; axis < 3; axis++)
@@ -185,7 +186,7 @@ void convert_for_cntrl(imuData *data, gyroAngle_t * angle, sensor_t *mag,
     angle->axis.roll *= RAD_TO_DEG;
     angle->axis.pitch *= RAD_TO_DEG;
     UART2PCString("End of function...: ");
-    UART2PCFloat(data->gyro.data[1]);
+    UART2PCFloat(data->gyroRate.data[1]);
     UART2PCNewLine();
     UART2PCNewLine();
 }
@@ -194,6 +195,8 @@ void rotateV(sensor_t *v, const gyroAngle_t *angle)
 {
     sensor_t v_tmp = *v;
 
+
+
     // angles for rotation matrix
     float cx = cosf(angle->axis.roll);
     float sx = sinf(angle->axis.roll);
@@ -201,7 +204,6 @@ void rotateV(sensor_t *v, const gyroAngle_t *angle)
     float sy = sinf(angle->axis.pitch);
     float cz = cosf(angle->axis.yaw);
     float sz = sinf(angle->axis.yaw);
-
 
     float czcx = cz * cx;
     float szcx = sz * cx;
@@ -215,7 +217,6 @@ void rotateV(sensor_t *v, const gyroAngle_t *angle)
     rmat[0][2] = sy;
     rmat[1][0] = szcx + (czsx * sy);
     rmat[1][1] = czcx - (szsx * sy);
-    rmat[1][2] = -sx * cy;
     rmat[2][0] = (szsx) - (czcx * sy);
     rmat[2][1] = (czsx) + (szcx * sy);
     rmat[2][2] = cy * cx;
