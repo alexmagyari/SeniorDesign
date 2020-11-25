@@ -19,7 +19,7 @@ typedef struct {
   float ki;
   float kd;
   float lastErr, iTerm, intLim;
-  float max, min; // not currently using these in PID.c
+  float max, min;
   float fc;  //cutoff frequency in Hz
   low_pass_t lowPass;
 } pid_data;
@@ -27,7 +27,6 @@ typedef struct {
 void pid_init(void);
 float pid_compute(pid_data *pidType, float setpoint, float input, float dt);
 
-// might not need these?
 void pid_resetRPY(void);
 void pid_resetAlt(void);
 void pid_resetXY(void);

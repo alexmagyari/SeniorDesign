@@ -24,4 +24,10 @@
 		<nature>org.eclipse.cdt.core.ccnature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
+	<variableList>
+		<variable>
+			<name>FREERTOS_INSTALL_DIR</name>
+			<value>file:/C:/CCS/FreeRTOS</value>
+		</variable>
+	</variableList>
 </projectDescription>

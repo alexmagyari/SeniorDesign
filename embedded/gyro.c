@@ -36,18 +36,18 @@ void get_gyro_data(imuData *data)
     x = x << 8;
     x |= I2CRead(GYROSCOPE, GYRO_X_LSB);
     float total = x / GYRO_SCALE_FACTOR;
-    UART2PCString("Gyro X Shifted: ");
-       UART2PCFloat(total);
-       UART2PCNewLine();
+//    UART2PCString("Gyro X Shifted: ");
+//       UART2PCFloat(total);
+//       UART2PCNewLine();
 
     int16_t y = I2CRead(GYROSCOPE, GYRO_Y_MSB);
     y = y << 8;
     y |= I2CRead(GYROSCOPE, GYRO_Y_LSB);
     float totalY = y / GYRO_SCALE_FACTOR;
     data->gyro.axis.Y = totalY;
-    UART2PCString("Gyro Y: ");
-    UART2PCFloat(totalY);
-    UART2PCNewLine();
+//    UART2PCString("Gyro Y: ");
+//    UART2PCFloat(totalY);
+//    UART2PCNewLine();
 
     int16_t z = I2CRead(GYROSCOPE, GYRO_Z_MSB);
     z = z << 8;
@@ -55,9 +55,9 @@ void get_gyro_data(imuData *data)
     float totalZ = z / GYRO_SCALE_FACTOR;
     data->gyro.axis.Z = totalZ;
 
-    UART2PCString("Gyro Z: ");
-    UART2PCFloat(totalZ);
-    UART2PCNewLine();
+//    UART2PCString("Gyro Z: ");
+//    UART2PCFloat(totalZ);
+//    UART2PCNewLine();
 
 }
 
@@ -70,25 +70,25 @@ void get_accel_data(imuData *data)
     x |= I2CRead(GYROSCOPE, ACCEL_X_LSB);
     float totalX = x;
     data->accel.axis.X = totalX / ACCEL_SCALE_FACTOR;
-    UART2PCString("Accel X: ");
-    UART2PCFloat(totalX / ACCEL_SCALE_FACTOR);
-    UART2PCNewLine();
+//    UART2PCString("Accel X: ");
+//    UART2PCFloat(totalX / ACCEL_SCALE_FACTOR);
+//    UART2PCNewLine();
     int16_t y = I2CRead(GYROSCOPE, ACCEL_Y_MSB);
     y = y << 8;
     y |= I2CRead(GYROSCOPE, ACCEL_Y_LSB);
     float totalY = y;
     data->accel.axis.Y = totalY / ACCEL_SCALE_FACTOR;
-    UART2PCString("Accel Y: ");
-    UART2PCFloat(totalY / ACCEL_SCALE_FACTOR);
-    UART2PCNewLine();
+//    UART2PCString("Accel Y: ");
+//    UART2PCFloat(totalY / ACCEL_SCALE_FACTOR);
+//    UART2PCNewLine();
     int16_t z = I2CRead(GYROSCOPE, ACCEL_Z_MSB);
     z = z << 8;
     z |= I2CRead(GYROSCOPE, ACCEL_Z_LSB);
     float totalZ = z;
     data->accel.axis.Z = totalZ / ACCEL_SCALE_FACTOR;
-    UART2PCString("Accel Z: ");
-    UART2PCFloat(totalZ / ACCEL_SCALE_FACTOR);
-    UART2PCNewLine();
+//    UART2PCString("Accel Z: ");
+//    UART2PCFloat(totalZ / ACCEL_SCALE_FACTOR);
+//    UART2PCNewLine();
 }
 
 void get_mag_data(imuData *data)
@@ -123,9 +123,17 @@ void get_mag_data(imuData *data)
 
 void getZeroMeas(imuData *cfg)
 {
-    boardOrientation(&(cfg->accel));
-    boardOrientation(&(cfg->gyro));
-    get_accel_data(cfg);
-    get_gyro_data(cfg);
-    get_mag_data(cfg);
+//    boardOrientation(&(cfg->accel));
+//    boardOrientation(&(cfg->gyro));
+//    get_accel_data(cfg);
+//    get_gyro_data(cfg);
+//    get_mag_data(cfg);
+    int i = 0;
+    for (i = 0; i < 3; i++){
+        cfg->accel.data[i] = 0;
+        cfg->gyro.data[i] = 0;
+        cfg->mag.data[i] = 0;
+        cfg->accelBody.data[i] = 0;
+        cfg->gyroRate.data[i] = 0;
+    }
 }

@@ -46,6 +46,28 @@
  *            |                  |
  * Author: Senior Design II Team 10
  *******************************************************************************/
+//#include <pthread.h>
+//#include <mqueue.h>
+//#include <semaphore.h>
+//#include <time.h>
+//#include <unistd.h>
+//
+///* TI-Driver Includes */
+//#include <ti/drivers/GPIO.h>
+//#include <ti/drivers/UART.h>
+//#include <ti/drivers/Timer.h>
+//#include <ti/display/Display.h>
+//
+///* SAP/DriverLib Includes */
+//#include <ti/sap/sap.h>
+//#include <ti/sbl/sbl.h>
+//#include <ti/sbl/sbl_image.h>
+//
+///* Local Includes */
+//#include "simple_application_processor.h"
+//#include "Profile/simple_gatt_profile.h"
+//#include "Board.h"
+//#include "platform.h"
 /* DriverLib Includes */
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 
@@ -87,11 +109,15 @@ int main(void)
     pid_data PIDs[6] = { pidRoll, pidPitch, pidYaw, pidAlt, pidX, pidY };
 
     UART_init();
-    UART2PCString("Pitch: ");
+    UART2PCString("Start: \0");
     I2C_init();
+    UART2PCString("I2C: \0");
     initPWM(MOTOR_PWM_PERIOD, 0);
-    altimeter_init();
+    UART2PCString("PWM: \0");
+//    altimeter_init();
+//    UART2PCString("ALT: \0");
     imu_init();
+    UART2PCString("IMU: \0");
     int startup = 0;
     while (startup < 1000)
         startup++;
@@ -138,7 +164,8 @@ int main(void)
         c--;
     printPIDs(PIDs);
 
-    float dt = 10;
+    float dt = 100000000;
+    int counter = 0;
 
     while (1)
     {
@@ -158,26 +185,47 @@ int main(void)
         controls.pitch_cmd = pid_compute(&PIDs[1], 0, cIMU.gyroRate.axis.pitch,
                                          dt);
 
-        compute_motor_commands(motors, 0, 0, controls.pitch_cmd, 0);
+        compute_motor_commands(&motors, 0, 0, controls.pitch_cmd, 0);
         editMotorPWM(0, motors.m0_duty);
         editMotorPWM(1, motors.m1_duty);
         editMotorPWM(2, motors.m2_duty);
         editMotorPWM(3, motors.m3_duty);
 
-        UART2PCString("Pitch: ");
-        UART2PCFloat(controls.pitch_cmd);
-        UART2PCNewLine();
+
+//        UART2PCString("pitch_cmd: ");
+//        UART2PCFloat(controls.pitch_cmd);
+//        UART2PCNewLine();
+
+        if (counter >= 2500)
+        {
+            UART2PCString("M0 Duty: ");
+            UART2PCFloat(motors.m0_duty);
+            UART2PCNewLine();
+            UART2PCString("M1 Duty: ");
+            UART2PCFloat(motors.m1_duty);
+            UART2PCNewLine();
+            counter = 0;
+        }
+        else
+        {
+
+            counter++;
+        }
 
         if (UART_HAS_MAIL)
         {
+            if (strcmp(UART_MAIL, "exit") == 0)
+                break;
             UART_getMail();
             UART2PCNewLine();
             updatePIDs(PIDs);
             printPIDs(PIDs);
 
         }
-    }
 
+    }
+    disarmMotors();
+    while (1);
     return 0;
 }
 
@@ -188,12 +236,12 @@ void updatePIDs(pid_data * PIDs)
     char * PIDProp;
     float PIDVal;
     int c = 0;
-    token = strtok(UART_MAIL, "->");
+    token = strtok(UART_MAIL, ",");
     PIDName = token;
     c++;
     while (token != NULL)
     {
-        token = strtok(NULL, "->");
+        token = strtok(NULL, ",");
         if (c == 1)
         {
 
@@ -213,7 +261,7 @@ void updatePIDs(pid_data * PIDs)
             {
                 PID_Tune(0, PIDProp, PIDVal, PIDs);
             }
-            else if (strcmp(PIDName, "pitch") == 0)
+            else if (strcmp(PIDName, "a") == 0)
             {
                 PID_Tune(1, PIDProp, PIDVal, PIDs);
             }

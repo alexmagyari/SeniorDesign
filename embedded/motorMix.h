@@ -23,7 +23,8 @@ typedef struct{
 #ifndef MOTOR_MIX_H_
 #define MOTOR_MIX_H_
 
+#define MOTOR_MAP_OFFSET 1000.0f
 #define MAX_MOTOR_OUT 1900
 #define MIN_MOTOR_OUT 1000
-void compute_motor_commands(motor_mix m_cmd, float thrust_cmd, float yaw_cmd, float pitch_cmd, float roll_cmd);
+void compute_motor_commands(motor_mix *m_cmd, float thrust_cmd, float yaw_cmd, float pitch_cmd, float roll_cmd);
 #endif

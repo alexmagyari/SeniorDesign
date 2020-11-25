@@ -20,20 +20,20 @@ void pid_init(void)
     pidRoll.lastErr = 0.0f;
     pidRoll.iTerm = 0.0f;
     pidRoll.intLim = 5.85f;
-    pidRoll.max = 200.0f;
-    pidRoll.min = -200.0f;
+    pidRoll.max = 100.0f;
+    pidRoll.min = -100.0f;
     pidRoll.fc = 150.0f;
     pidRoll.lowPass.prevOutput = 0.0f;
 
     strcpy(pidPitch.desc, "pitch\0");
-    pidPitch.kp = 0.250f;
-    pidPitch.ki = 0.950f;
-    pidPitch.kd = 0.011f;
+    pidPitch.kp = 10.0f;
+    pidPitch.ki = 1.5f;
+    pidPitch.kd = 0.28f;
     pidPitch.lastErr = 0.0f;
     pidPitch.iTerm = 0.0f;
     pidPitch.intLim = 5.85f;
-    pidPitch.max = 200.0f;
-    pidPitch.min = -200.0f;
+    pidPitch.max = 1000.0f;
+    pidPitch.min = -1000.0f;
     pidPitch.fc = 150.0f;
     pidPitch.lowPass.prevOutput = 0.0f;
 
@@ -76,7 +76,7 @@ void pid_init(void)
     strcpy(pidY.desc, "y\0");
     pidY.kp = 1.0f;
     pidY.ki = 0.0f;
-    pidY.kd = 0.1f;
+    pidY.kd = 0.0f;
     pidY.lastErr = 0.0f;
     pidY.iTerm = 0.0f;
     pidY.intLim = 5.0f;
@@ -97,42 +97,48 @@ float pid_compute(pid_data *pid, float setpoint, float current, float dt)
     // calc P-Term
     pTerm = pid->kp * err;
 
-
     // calc I-Term
     // trapezoidal integration
-    pid->iTerm += pid->ki * (err + pid->lastErr) / (2.0f * dt);
+    pid->iTerm = pid->ki * (err + pid->lastErr) * dt / 2.0f;
     // clamping for anti-windup
-    pid->iTerm = constrain(pid->iTerm, -pid->intLim, pid->intLim);
+    if (pid->iTerm < -1 * pid->intLim)
+        pid->iTerm = -1 * pid->intLim;
+    if (pid->iTerm > pid->intLim)
+        pid->iTerm = pid->intLim;
+//    pid->iTerm = constrain(pid->iTerm, -pid->intLim, pid->intLim);
 
     // calc D-Term
     deltaErr = (err - pid->lastErr) / dt;
     pid->lastErr = err;
 
-    // exponential smoothing to reduce noise impact
+    // exponential smoothing to reduce noise impact in derivative term
     pid->lowPass.Fc = pid->fc;  // set lowPass frequency
     deriv = applyLowPass(&pid->lowPass, deltaErr, dt);
     pid->lowPass.prevOutput = deriv;
     dTerm = pid->kd * deriv;
 
     output = (pTerm + pid->iTerm + dTerm);
-    UART2PCString("PIDOutput: ");
-            UART2PCFloat(output);
-            UART2PCNewLine();
-            UART2PCString("Error: ");
-                    UART2PCFloat(err);
-                    UART2PCNewLine();
-    /*
-     if(pid->max < output)
-     {
-     output = pid->max;
-     pid-> iErr=0.0f;
-     }
-     else if(pid->min > output)
-     {
-     output = pid->min;
-     pid->iErr = 0.0f;
-     }
-     */
+
+    if (pid->max < output)
+    {
+        output = pid->max;
+//     pid-> iErr=0.0f;
+    }
+    else if (pid->min > output)
+    {
+        output = pid->min;
+//     pid->iErr = 0.0f;
+    }
+
+//    UART2PCString("PIDOutput: ");
+//    UART2PCFloat(output);
+//    UART2PCNewLine();
+//    UART2PCString("Error: ");
+//    UART2PCFloat(err);
+//    UART2PCNewLine();
+//    UART2PCString("Last Error: ");
+//    UART2PCFloat(pid->lastErr);
+//    UART2PCNewLine();
 
     return output;
 }
